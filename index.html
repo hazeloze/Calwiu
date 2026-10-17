@@ -1,347 +1,323 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080b12">
-<title>CALWIU | eFootball Guides</title>
-<meta name="description" content="Explore eFootball player progressions, best formations and tactical guides on CALWIU.">
+<title>CALWIU — eFootball Builds & Tactics</title>
+<meta name="description" content="Discover eFootball player progression builds, player stats, formations and tactical guides on CALWIU.">
+<meta property="og:title" content="CALWIU — eFootball Builds & Tactics">
+<meta property="og:description" content="Find player builds, progression guides and formations for eFootball.">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#080b12;--panel:#111827;--line:#263247;--green:#b8ff45;--muted:#aab5c6}
+:root{color-scheme:dark;--bg:#080808;--panel:#111111;--panel2:#181818;--line:#303030;--green:#f2f0eb;--green2:#ffffff;--muted:#a3a3a3;--white:#f5f5f3;--red:#ff6978}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:#f5f7fb;font-family:Arial,sans-serif}
-header{padding:20px 5%;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.logo{font-size:27px;font-weight:900;letter-spacing:2px;color:var(--green)}
-button,.btn{background:var(--green);color:#10150b;border:0;border-radius:9px;padding:12px 16px;font-weight:800;cursor:pointer}
-button.secondary{background:#273449;color:white}
-button.danger{background:#52242c;color:white}
-main{max-width:1100px;margin:auto;padding:24px 5% 60px}
-.hero{padding:42px 24px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(135deg,#172c27,#111827 60%,#20213a)}
-.hero h1{font-size:clamp(34px,8vw,60px);margin:0 0 12px}
-.hero h1 span{color:var(--green)}
-p{line-height:1.6}
-.muted{color:var(--muted)}
-nav{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0}
-nav button{background:#1b2637;color:white}
-nav button.active{background:var(--green);color:#10150b}
-input,select,textarea{width:100%;padding:12px;margin:6px 0 14px;background:#0b1220;border:1px solid var(--line);border-radius:8px;color:white;font:inherit}
-label{font-size:14px;color:#dce4ef}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
-.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
-.card{cursor:pointer;overflow-wrap:anywhere}
-.card h3{margin:10px 0}
-.tag{font-size:12px;color:var(--green);text-transform:uppercase;letter-spacing:1px}
-.card img{width:100%;height:145px;object-fit:cover;border-radius:9px;background:#202b3b}
-section{margin-top:24px}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--white);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(1180px,92%);margin:auto}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(8,8,8,.92);backdrop-filter:blur(16px);border-bottom:1px solid #263342}
+.header{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:950;letter-spacing:3px;font-size:23px}
+.brand-mark{width:32px;height:32px;display:grid;place-items:center;background:#f2f0eb;color:#080808;border-radius:2px;font-size:18px;transform:skew(-8deg)}
+.brand span:last-child{color:#f2f0eb}
+.header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid transparent;border-radius:3px;padding:11px 15px;font-weight:850;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.18s}
+.btn-primary{background:#f2f0eb;color:#080808}
+.btn-primary:hover{background:#ffffff;transform:translateY(-1px)}
+.btn-ghost{background:#171717;color:var(--white);border-color:#2b3948}
+.btn-ghost:hover{border-color:#eeeeee;color:#ffffff}
+.btn-danger{background:#4a2029;color:white}
+.hero{padding:78px 0 42px}
+.hero-box{position:relative;overflow:hidden;min-height:370px;border:1px solid #303030;border-radius:3px;padding:clamp(28px,6vw,72px);background:linear-gradient(105deg,rgba(8,8,8,.98),rgba(8,8,8,.76) 58%,rgba(8,8,8,.35)),radial-gradient(circle at 82% 28%,#454545,transparent 42%),linear-gradient(135deg,#1d1d1d,#090909)}
+.hero-box:after{content:"11";position:absolute;right:4%;bottom:-105px;font-size:clamp(200px,36vw,390px);line-height:1;font-weight:1000;letter-spacing:-25px;color:rgba(255,255,255,.035);pointer-events:none}
+.eyebrow{color:#c8c8c4;font-size:12px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase}
+.hero h1{position:relative;z-index:1;font-size:clamp(42px,8vw,92px);line-height:.91;letter-spacing:-4px;max-width:760px;margin:16px 0}
+.hero h1 em{font-style:normal;color:#f2f0eb}
+.hero p{position:relative;z-index:1;max-width:580px;color:#bac5ce;line-height:1.7;font-size:16px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px;position:relative;z-index:1}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 0}
+.stat{border:1px solid var(--line);border-radius:14px;background:rgba(16,23,32,.8);padding:17px}
+.stat strong{display:block;font-size:23px;color:#f2f0eb}
+.stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.section{padding:32px 0}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:18px;flex-wrap:wrap}
+.section-head h2{margin:5px 0 0;font-size:clamp(24px,4vw,34px);letter-spacing:-.8px}
+.section-head p{color:var(--muted);margin:7px 0 0;line-height:1.5}
+.toolbar{display:grid;grid-template-columns:minmax(180px,1fr) 190px;gap:10px;margin:20px 0 14px}
+.field,select,textarea{width:100%;border:1px solid #333333;background:#101010;color:var(--white);border-radius:3px;padding:13px 14px;outline:none}
+.field:focus,select:focus,textarea:focus{border-color:#eeeeee;box-shadow:0 0 0 3px rgba(255,255,255,.08)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 20px}
+.tab{border:1px solid #303030;border-radius:2px;padding:10px 15px;background:#151515;color:#bac5d0;font-size:13px;font-weight:850}
+.tab.active{background:#f2f0eb;color:#080808;border-color:#eeeeee}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.guide-card{min-width:0;overflow:hidden;border:1px solid #2b2b2b;border-radius:3px;background:linear-gradient(180deg,#171717,#101010);transition:transform .18s,border-color .18s;cursor:pointer}
+.guide-card:hover{transform:translateY(-3px);border-color:#777777}
+.card-image{height:230px;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 10%,#303030,#151515 70%);display:grid;place-items:center}
+.card-image img{width:100%;height:100%;object-fit:cover;display:block}
+.card-placeholder{font-size:56px;font-weight:1000;color:rgba(255,255,255,.72);letter-spacing:-3px}
+.card-category{position:absolute;top:12px;left:12px;padding:7px 9px;border-radius:7px;background:rgba(6,10,14,.88);color:#f2f0eb;font-size:10px;letter-spacing:1px;font-weight:900;text-transform:uppercase}
+.card-rating{position:absolute;right:12px;top:12px;background:#f2f0eb;color:#080808;border-radius:8px;padding:7px 9px;font-weight:1000;font-size:13px}
+.card-body{padding:18px}
+.card-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:12px}
+.pill{padding:5px 8px;border-radius:6px;background:#222222;border:1px solid #373737}
+.guide-card h3{font-size:19px;line-height:1.3;margin:12px 0 8px;letter-spacing:-.3px}
+.card-desc{font-size:13px;line-height:1.55;color:var(--muted);margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;padding-top:13px;border-top:1px solid #263342;color:#d4dfeb;font-size:12px;font-weight:800}
+.arrow{color:#eeeeee;font-size:18px}
+.empty{grid-column:1/-1;text-align:center;border:1px dashed #344354;border-radius:16px;padding:40px 20px;color:var(--muted)}
+.empty strong{display:block;color:var(--white);font-size:18px;margin-bottom:7px}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.feature{border:1px solid var(--line);border-radius:3px;background:linear-gradient(140deg,#191919,#101010);padding:23px}
+.feature-icon{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.08);display:grid;place-items:center;color:#f2f0eb;font-size:21px}
+.feature h3{margin:15px 0 7px}
+.feature p{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
+.panel{background:#111111;border:1px solid var(--line);border-radius:3px;padding:22px;margin:18px 0}
 .hidden{display:none!important}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.notice{padding:12px;border-radius:8px;background:#172437;margin:12px 0;overflow-wrap:anywhere}
-footer{text-align:center;color:var(--muted);padding:24px;border-top:1px solid var(--line)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.form-grid .full{grid-column:1/-1}
+label{display:block;font-size:12px;font-weight:800;color:#c6d0db;margin:9px 0 5px}
+input[type=checkbox]{width:auto;accent-color:#f2f0eb}
+.checkline{display:flex;align-items:center;gap:9px;margin:12px 0;color:#dbe3ea}
+.notice{padding:12px 14px;background:#202020;border:1px solid #3b3b3b;border-radius:10px;margin:12px 0;color:#dce7ef;overflow-wrap:anywhere}
+.detail-modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);padding:18px;display:none;overflow-y:auto}
+.detail-modal.open{display:block}
+.modal-card{width:min(850px,100%);margin:30px auto;background:#0e151e;border:1px solid #334250;border-radius:20px;overflow:hidden;box-shadow:0 30px 100px #000}
+.modal-top{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+.modal-content{padding:clamp(18px,4vw,32px)}
+.modal-hero{display:grid;grid-template-columns:220px 1fr;gap:22px;align-items:start}
+.modal-image{width:100%;height:260px;object-fit:cover;border-radius:13px;background:#202020}
+.modal-content h2{font-size:clamp(27px,5vw,42px);line-height:1.05;margin:10px 0}
+.detail-label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1.4px;font-weight:900}
+.detail-chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.detail-chips span{padding:7px 9px;background:#222222;border:1px solid #393939;border-radius:8px;font-size:12px}
+.detail-section{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+.detail-section h3{margin:0 0 12px}
+.detail-copy{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;color:#c5d0db}
+.stat-list{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.stat-item{background:#1c1c1c;border:1px solid #333333;border-radius:10px;padding:12px}
+.stat-item span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.8px}
+.stat-item strong{display:block;margin-top:5px;overflow-wrap:anywhere}
+.admin-guide-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.admin-guide-row:last-child{border-bottom:0}
+.admin-guide-row small{display:block;color:var(--muted);margin-top:4px}
+footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);font-size:13px;margin-top:30px}
+.footer-inner{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.card-image{height:170px}.hero{padding-top:35px}}
+@media(max-width:560px){.wrap{width:91%}.header{min-height:64px}.brand{font-size:21px}.brand-mark{width:30px;height:30px}.header-actions .btn{padding:9px 10px;font-size:12px}.hero-box{border-radius:18px;min-height:0;padding:28px 21px}.hero h1{letter-spacing:-1.6px}.stat-row{gap:7px}.stat{padding:12px 9px}.stat strong{font-size:19px}.stat span{font-size:9px;letter-spacing:.5px}.toolbar{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.card-image{height:155px}.card-body{padding:11px}.guide-card h3{font-size:15px;margin:9px 0 6px}.card-meta{font-size:10px}.card-desc{font-size:12px}.card-foot{font-size:10px;margin-top:12px;padding-top:10px}.card-rating{font-size:11px;top:8px;right:8px;padding:5px 7px}.card-category{top:8px;left:8px;padding:5px 6px;font-size:8px}.feature-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.panel{padding:15px}.modal-hero{grid-template-columns:1fr}.modal-image{height:230px;max-width:100%}.detail-modal{padding:8px}.modal-card{margin:10px auto}.stat-list{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
-<header>
-  <div class="logo">CALWIU</div>
-  <button class="secondary" id="loginToggle">Admin Login</button>
-</header>
-<main>
-  <div class="hero">
-    <p class="tag">eFootball guide hub</p>
-    <h1>BUILD YOUR <span>BEST SQUAD.</span></h1>
-    <p class="muted">Player progressions, formations and tactics to level up your game.</p>
-  </div>
+<div class="topbar">
+  <header class="header wrap">
+    <a class="brand" href="#" aria-label="CALWIU home"><span class="brand-mark">C</span><span>CALWIU</span></a>
+    <div class="header-actions">
+      <a class="btn btn-ghost" href="#guides">Explore Builds</a>
+      <button class="btn btn-primary" id="loginToggle">Admin Login</button>
+    </div>
+  </header>
+</div>
+<main class="wrap">
+  <section class="hero" id="home">
+    <div class="hero-box">
+      <div class="eyebrow">eFootball Builds & Tactics</div>
+      <h1>KNOW YOUR<br><em>GAME.</em></h1>
+      <p>A considered library of eFootball player builds, squad formations and tactical guides. Find your setup. Understand the details. Make every point count.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#guides">Explore Player Builds <span>↗</span></a>
+        <a class="btn btn-ghost" href="#formations">Explore Formations</a>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><strong id="progressionCount">—</strong><span>Player builds</span></div>
+      <div class="stat"><strong id="formationCount">—</strong><span>Formation guides</span></div>
+      <div class="stat"><strong>24/7</strong><span>Build library</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="guides">
+    <div class="section-head">
+      <div><div class="eyebrow">The guide library</div><h2>Find your next build.</h2><p>Search players, positions, playstyles and formations.</p></div>
+    </div>
+    <div class="toolbar">
+      <input class="field" id="search" type="search" placeholder="⌕  Search player, manager, formation..." aria-label="Search guides">
+      <select id="positionFilter" aria-label="Filter by position">
+        <option value="all">All positions</option><option>GK</option><option>CB</option><option>LB</option><option>RB</option><option>DMF</option><option>CMF</option><option>AMF</option><option>LMF</option><option>RMF</option><option>LWF</option><option>RWF</option><option>SS</option><option>CF</option>
+      </select>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Guide category">
+      <button class="tab active" data-filter="all">All Guides</button>
+      <button class="tab" data-filter="progression">Player Progressions</button>
+      <button class="tab" data-filter="formation">Best Formations</button>
+    </div>
+    <div id="guideGrid" class="grid" aria-live="polite"></div>
+    <p id="publicMessage" class="muted"></p>
+  </section>
+
+  <section class="section" id="formations">
+    <div class="section-head"><div><div class="eyebrow">Play with a plan</div><h2>More than just a formation.</h2><p>Understand the setup, roles and tactics behind the squad.</p></div></div>
+    <div class="feature-grid">
+      <article class="feature"><div class="feature-icon">⌘</div><h3>Player Progressions</h3><p>Browse player-specific builds, position, playstyle and progression point recommendations. Open a guide to read the full build.</p><div style="margin-top:17px"><button class="btn btn-ghost" onclick="setCategory('progression')">Browse Progressions ↗</button></div></article>
+      <article class="feature"><div class="feature-icon">⚽</div><h3>Best Formations</h3><p>Explore formation guides with manager details, squad tactics, attacking approach and defensive setup.</p><div style="margin-top:17px"><button class="btn btn-ghost" onclick="setCategory('formation')">Browse Formations ↗</button></div></article>
+    </div>
+  </section>
 
   <section id="loginPanel" class="panel hidden">
-    <h2>Admin Login</h2>
-    <p class="muted">Only your authorised admin account should sign in here.</p>
+    <div class="section-head"><div><div class="eyebrow">Restricted access</div><h2>Admin sign in</h2><p>Only the authorised CALWIU admin account can manage guides.</p></div></div>
     <form id="loginForm">
-      <label>Email</label>
-      <input id="email" type="email" autocomplete="username" required>
-      <label>Password</label>
-      <input id="password" type="password" autocomplete="current-password" required>
-      <button type="submit">Sign in</button>
-      <button type="button" class="secondary" id="cancelLogin">Cancel</button>
+      <label for="email">Email</label><input class="field" id="email" type="email" autocomplete="username" required>
+      <label for="password">Password</label><input class="field" id="password" type="password" autocomplete="current-password" required>
+      <div class="actions"><button class="btn btn-primary" type="submit">Sign in</button><button class="btn btn-ghost" type="button" id="cancelLogin">Cancel</button></div>
     </form>
     <div id="loginMessage" class="notice hidden"></div>
   </section>
 
   <section id="adminPanel" class="panel hidden">
-    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
-      <h2>CALWIU Admin</h2>
-      <button id="logoutButton" class="secondary">Sign out</button>
-    </div>
-    <p class="muted">Create a guide, save it as a draft, or publish it for visitors.</p>
+    <div class="section-head"><div><div class="eyebrow">Content management</div><h2>CALWIU Admin</h2><p>Add a guide, save it as a draft, or publish it for visitors.</p></div><button id="logoutButton" class="btn btn-ghost">Sign out</button></div>
     <form id="guideForm">
-      <label>Guide category</label>
-      <select id="category">
-        <option value="progression">Player Progression</option>
-        <option value="formation">Best Formation</option>
-      </select>
-      <label>Guide title *</label>
-      <input id="title" required placeholder="e.g. Best build for your striker">
-      <label>Player name (optional)</label>
-      <input id="player_name" placeholder="e.g. Kylian Mbappé">
-      <label>Position (optional)</label>
-      <input id="position" placeholder="e.g. CF">
-      <label>Playstyle (optional)</label>
-      <input id="playstyle" placeholder="e.g. Goal Poacher">
-      <label>Formation (optional)</label>
-      <input id="formation" placeholder="e.g. 4-3-3">
-      <label>Manager (optional)</label>
-      <input id="manager" placeholder="Manager name">
-      <label>Squad tactics (optional)</label>
-      <textarea id="tactics" rows="3" placeholder="Attacking style, defensive approach, instructions..."></textarea>
-      <label>Progression details as JSON (optional)</label>
-      <textarea id="progression" rows="4">{}</textarea>
-      <label>Guide content *</label>
-      <textarea id="content" rows="5" required placeholder="Write your guide here..."></textarea>
-      <label>Image URL (optional)</label>
-      <input id="image_url" type="url" placeholder="https://...">
-      <label><input id="published" type="checkbox" style="width:auto;margin-right:8px">Publish this guide</label>
-      <div class="actions">
-        <button type="submit" id="saveButton">Save guide</button>
-        <button type="button" id="resetButton" class="secondary">Clear form</button>
+      <div class="form-grid">
+        <div><label for="category">Guide category</label><select id="category"><option value="progression">Player Progression</option><option value="formation">Best Formation</option></select></div>
+        <div><label for="title">Guide title *</label><input class="field" id="title" required placeholder="e.g. Epic Striker — Finishing Build"></div>
+        <div><label for="player_name">Player name</label><input class="field" id="player_name" placeholder="Player name"></div>
+        <div><label for="position">Position</label><input class="field" id="position" placeholder="e.g. CF"></div>
+        <div><label for="playstyle">Playstyle</label><input class="field" id="playstyle" placeholder="e.g. Goal Poacher"></div>
+        <div><label for="formation">Formation</label><input class="field" id="formation" placeholder="e.g. 4-2-1-3"></div>
+        <div><label for="manager">Manager</label><input class="field" id="manager" placeholder="Manager name"></div>
+        <div><label for="image_url">Image URL</label><input class="field" id="image_url" type="url" placeholder="https://..."></div>
+        <div class="full"><label for="tactics">Squad tactics / manager instructions</label><textarea id="tactics" rows="3" placeholder="Attacking style, defensive approach, player instructions..."></textarea></div>
+        <div class="full"><label for="progression">Progression details (JSON)</label><textarea id="progression" rows="4">{"Shooting": 8, "Passing": 6}</textarea><p class="muted" style="font-size:12px;margin-top:-8px">Enter valid JSON, e.g. {"Shooting": 8, "Dexterity": 10}. For formations, use {} if not needed.</p></div>
+        <div class="full"><label for="content">Guide content *</label><textarea id="content" rows="5" required placeholder="Explain why this build works, player role, strengths and how to use it..."></textarea></div>
       </div>
+      <label class="checkline"><input id="published" type="checkbox"> Publish this guide for public visitors</label>
+      <div class="actions"><button class="btn btn-primary" type="submit" id="saveButton">Save guide</button><button class="btn btn-ghost" type="button" id="resetButton">Clear form</button></div>
     </form>
     <div id="adminMessage" class="notice hidden"></div>
+    <div class="detail-section"><h3>Manage guides</h3><div id="adminGuideList"></div></div>
   </section>
-
-  <section>
-    <h2>Explore Guides</h2>
-    <input id="search" type="search" placeholder="Search players, formations, managers...">
-    <nav>
-      <button class="active" data-filter="all">All Guides</button>
-      <button data-filter="progression">Player Progressions</button>
-      <button data-filter="formation">Best Formations</button>
-    </nav>
-    <div id="guideGrid" class="grid"></div>
-    <p id="publicMessage" class="muted"></p>
-  </section>
-  <section id="detailPanel" class="panel hidden"></section>
 </main>
-<footer>CALWIU — eFootball guides and tactics</footer>
+<footer><div class="wrap footer-inner"><div><strong style="color:#f2f0eb;letter-spacing:2px">CALWIU</strong><p>A player-first library for eFootball builds and tactics.</p></div><div>Independent fan guide. Not affiliated with KONAMI.</div></div></footer>
 
+<div class="detail-modal" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+  <div class="modal-card">
+    <div class="modal-top"><span class="eyebrow">CALWIU GUIDE</span><button class="btn btn-ghost" id="closeDetail" aria-label="Close guide">✕ Close</button></div>
+    <div class="modal-content" id="detailContent"></div>
+  </div>
+</div>
 <script>
 const SUPABASE_URL = 'https://tolxyznfykrstnrpzgen.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_bTAD_fpX7ocWRY_e7tQ9gA_B36v3S_k';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-let currentUser = null;
-let guides = [];
-let activeFilter = 'all';
-let editingId = null;
-
+let currentUser = null, guides = [], activeFilter = 'all', editingId = null;
 const $ = id => document.getElementById(id);
-const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({
-  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-}[c]));
-
-function message(id, text) {
-  $(id).textContent = text;
-  $(id).classList.remove('hidden');
+const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function message(id,text){$(id).textContent=text;$(id).classList.remove('hidden')}
+function hideMessage(id){$(id).classList.add('hidden')}
+function slugify(value){return value.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'guide'}
+function updatePanels(){
+  $('adminPanel').classList.toggle('hidden',!currentUser);
+  $('loginToggle').textContent=currentUser?'Admin Panel':'Admin Login';
 }
-function hideMessage(id) { $(id).classList.add('hidden'); }
-
-function slugify(value) {
-  return value.toLowerCase().trim()
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'guide';
+function updateStats(){
+  $('progressionCount').textContent=guides.filter(g=>g.category==='progression'&&g.published).length;
+  $('formationCount').textContent=guides.filter(g=>g.category==='formation'&&g.published).length;
 }
-
-function updatePanels() {
-  $('adminPanel').classList.toggle('hidden', !currentUser);
-  $('loginToggle').textContent = currentUser ? 'Admin signed in' : 'Admin Login';
+function getInitials(g){const name=(g.player_name||g.title||'CW').trim();return name.split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase()}
+async function loadGuides(){
+  $('publicMessage').textContent='Loading guide library...';
+  const {data,error}=await db.from('guides').select('*').order('created_at',{ascending:false});
+  if(error){$('publicMessage').textContent='Could not load guides. Please refresh and try again.';console.error(error);return}
+  guides=data||[];updateStats();renderGuides();renderAdminGuides();
 }
-
-async function loadGuides() {
-  $('publicMessage').textContent = 'Loading guides...';
-  const { data, error } = await db.from('guides')
-    .select('*').order('created_at', { ascending: false });
-
-  if (error) {
-    $('publicMessage').textContent = 'Could not load guides. Please refresh and try again.';
-    console.error(error);
-    return;
-  }
-  guides = data || [];
-  renderGuides();
+function renderGuides(){
+  const term=$('search').value.trim().toLowerCase(),pos=$('positionFilter').value.toLowerCase();
+  const visible=guides.filter(g=>(currentUser||g.published)&&(activeFilter==='all'||g.category===activeFilter)&&
+    (pos==='all'||String(g.position||'').toLowerCase().split(/[\/, -]+/).includes(pos))&&
+    [g.title,g.player_name,g.position,g.playstyle,g.formation,g.manager,g.content].some(v=>String(v||'').toLowerCase().includes(term)));
+  $('guideGrid').innerHTML=visible.map(g=>{
+    const image=g.image_url?`<img src="${escapeHTML(g.image_url)}" alt="${escapeHTML(g.player_name||g.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">`:'';
+    const draft=currentUser&&!g.published?'<span class="pill">Draft</span>':'';
+    const subtitle=g.category==='progression'?(g.position||'Player build'):(g.formation||'Tactics guide');
+    return `<article class="guide-card" tabindex="0" role="button" aria-label="Open ${escapeHTML(g.title)}" onclick="showGuide('${g.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showGuide('${g.id}')}">
+      <div class="card-image">${image}<div class="card-placeholder" style="${g.image_url?'display:none':''}">${escapeHTML(getInitials(g))}</div><span class="card-category">${g.category==='progression'?'Player Build':'Formation Guide'}</span>${g.position?`<span class="card-rating">${escapeHTML(g.position)}</span>`:''}</div>
+      <div class="card-body"><div class="card-meta"><span class="pill">${escapeHTML(subtitle)}</span>${g.playstyle?`<span class="pill">${escapeHTML(g.playstyle)}</span>`:''}${draft}</div><h3>${escapeHTML(g.title)}</h3><p class="card-desc">${escapeHTML(g.content||'Open this guide to view details.')}</p><div class="card-foot"><span>${escapeHTML(g.player_name||g.manager||'CALWIU GUIDE')}</span><span class="arrow">↗</span></div>
+      ${currentUser?`<div class="actions" onclick="event.stopPropagation()"><button class="btn btn-ghost" onclick="editGuide('${g.id}')">Edit</button><button class="btn btn-danger" onclick="deleteGuide('${g.id}')">Delete</button></div>`:''}</div></article>`;
+  }).join('');
+  $('publicMessage').textContent=visible.length?'Showing '+visible.length+' guide'+(visible.length===1?'':'s')+'.':'No guides match this search yet.';
 }
-
-function renderGuides() {
-  const term = $('search').value.trim().toLowerCase();
-  const visible = guides.filter(g =>
-    (activeFilter === 'all' || g.category === activeFilter) &&
-    [g.title,g.player_name,g.position,g.playstyle,g.formation,g.manager,g.content]
-      .some(v => String(v || '').toLowerCase().includes(term))
-  );
-
-  $('guideGrid').innerHTML = visible.map(g => `
-    <article class="card" onclick="showGuide('${g.id}')">
-      ${g.image_url ? `<img src="${escapeHTML(g.image_url)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
-      <p class="tag">${g.category === 'progression' ? 'Player Progression' : 'Best Formation'}</p>
-      <h3>${escapeHTML(g.title)}</h3>
-      <p class="muted">${escapeHTML(g.player_name || g.formation || g.manager || 'eFootball guide')}</p>
-      ${currentUser ? `<p class="muted">${g.published ? 'Published' : 'Draft'}</p>
-      <div class="actions" onclick="event.stopPropagation()">
-        <button class="secondary" onclick="editGuide('${g.id}')">Edit</button>
-        <button class="danger" onclick="deleteGuide('${g.id}')">Delete</button>
-      </div>` : ''}
-    </article>
-  `).join('');
-
-  $('publicMessage').textContent = visible.length ? '' : 'No guides found yet.';
+function setCategory(category){
+  activeFilter=category;document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b.dataset.filter===category));
+  $('search').value='';$('positionFilter').value='all';renderGuides();$('guides').scrollIntoView({behavior:'smooth'});
 }
-
-window.showGuide = id => {
-  const g = guides.find(item => item.id === id);
-  if (!g) return;
-  const detail = $('detailPanel');
-  detail.classList.remove('hidden');
-  detail.innerHTML = `
-    <button class="secondary" onclick="document.getElementById('detailPanel').classList.add('hidden')">Close</button>
-    <p class="tag">${g.category === 'progression' ? 'Player Progression' : 'Best Formation'}</p>
-    <h2>${escapeHTML(g.title)}</h2>
-    ${g.image_url ? `<img src="${escapeHTML(g.image_url)}" alt="" style="max-width:100%;max-height:260px;object-fit:contain">` : ''}
-    ${g.player_name ? `<p><b>Player:</b> ${escapeHTML(g.player_name)}</p>` : ''}
-    ${g.position ? `<p><b>Position:</b> ${escapeHTML(g.position)}</p>` : ''}
-    ${g.playstyle ? `<p><b>Playstyle:</b> ${escapeHTML(g.playstyle)}</p>` : ''}
-    ${g.formation ? `<p><b>Formation:</b> ${escapeHTML(g.formation)}</p>` : ''}
-    ${g.manager ? `<p><b>Manager:</b> ${escapeHTML(g.manager)}</p>` : ''}
-    ${g.tactics ? `<h3>Squad Tactics</h3><p style="white-space:pre-wrap">${escapeHTML(g.tactics)}</p>` : ''}
-    ${g.category === 'progression' ? `<h3>Progression Details</h3><pre style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHTML(JSON.stringify(g.progression || {},null,2))}</pre>` : ''}
-    <h3>Guide</h3><p style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHTML(g.content)}</p>
-  `;
-  detail.scrollIntoView({behavior:'smooth',block:'start'});
-};
-
-function resetForm() {
-  editingId = null;
-  $('guideForm').reset();
-  $('progression').value = '{}';
-  $('saveButton').textContent = 'Save guide';
-  hideMessage('adminMessage');
+window.setCategory=setCategory;
+function progressionHTML(value){
+  if(!value||typeof value!=='object'||!Object.keys(value).length)return '<p class="detail-copy">No progression points added to this guide yet.</p>';
+  return `<div class="stat-list">${Object.entries(value).map(([k,v])=>`<div class="stat-item"><span>${escapeHTML(k)}</span><strong>${escapeHTML(typeof v==='object'?JSON.stringify(v):v)}</strong></div>`).join('')}</div>`;
 }
-
-window.editGuide = id => {
-  const g = guides.find(item => item.id === id);
-  if (!g || !currentUser) return;
-  editingId = id;
-  ['category','title','player_name','position','playstyle','formation','manager','tactics','content','image_url']
-    .forEach(key => $(key).value = g[key] || '');
-  $('progression').value = JSON.stringify(g.progression || {}, null, 2);
-  $('published').checked = !!g.published;
-  $('saveButton').textContent = 'Update guide';
-  hideMessage('adminMessage');
-  $('adminPanel').scrollIntoView({behavior:'smooth'});
+window.showGuide=id=>{
+  const g=guides.find(item=>item.id===id);if(!g)return;
+  const detail=$('detailContent');
+  detail.innerHTML=`<div class="modal-hero"><div>${g.image_url?`<img class="modal-image" src="${escapeHTML(g.image_url)}" alt="${escapeHTML(g.player_name||g.title)}" onerror="this.style.display='none'">`:`<div class="modal-image card-placeholder" style="display:grid;place-items:center">${escapeHTML(getInitials(g))}</div>`}</div><div><div class="detail-label">${g.category==='progression'?'PLAYER PROGRESSION':'FORMATION & TACTICS'}</div><h2 id="detailTitle">${escapeHTML(g.title)}</h2><div class="detail-chips">${g.player_name?`<span>Player: ${escapeHTML(g.player_name)}</span>`:''}${g.position?`<span>Position: ${escapeHTML(g.position)}</span>`:''}${g.playstyle?`<span>${escapeHTML(g.playstyle)}</span>`:''}${g.formation?`<span>Formation: ${escapeHTML(g.formation)}</span>`:''}${g.manager?`<span>Manager: ${escapeHTML(g.manager)}</span>`:''}</div><p class="detail-copy">${escapeHTML(g.content||'')}</p></div></div>
+  ${g.category==='progression'?`<div class="detail-section"><h3>Progression points</h3>${progressionHTML(g.progression)}</div>`:''}
+  ${g.tactics?`<div class="detail-section"><h3>Squad tactics</h3><p class="detail-copy">${escapeHTML(g.tactics)}</p></div>`:''}
+  <div class="detail-section"><h3>About this guide</h3><p class="detail-copy">Use this as a starting point and adjust the build to your playstyle, player version and squad needs.</p></div>`;
+  $('detailModal').classList.add('open');document.body.style.overflow='hidden';
 };
-
-window.deleteGuide = async id => {
-  if (!currentUser || !confirm('Delete this guide permanently?')) return;
-  const { error } = await db.from('guides').delete().eq('id',id);
-  if (error) return message('adminMessage','Delete failed: ' + error.message);
-  message('adminMessage','Guide deleted.');
-  await loadGuides();
+function closeDetail(){$('detailModal').classList.remove('open');document.body.style.overflow=''}
+$('closeDetail').onclick=closeDetail;
+$('detailModal').addEventListener('click',e=>{if(e.target===$('detailModal'))closeDetail()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDetail()});
+function renderAdminGuides(){
+  if(!currentUser){$('adminGuideList').innerHTML='';return}
+  $('adminGuideList').innerHTML=guides.length?guides.map(g=>`<div class="admin-guide-row"><div><strong>${escapeHTML(g.title)}</strong><small>${g.published?'Published':'Draft'} · ${g.category==='progression'?'Player progression':'Formation'}</small></div><div class="actions" style="margin:0"><button class="btn btn-ghost" onclick="editGuide('${g.id}')">Edit</button></div></div>`).join(''):'<p class="muted">No guides created yet.</p>';
+}
+function resetForm(){editingId=null;$('guideForm').reset();$('progression').value='{}';$('saveButton').textContent='Save guide';hideMessage('adminMessage')}
+window.editGuide=id=>{
+  const g=guides.find(item=>item.id===id);if(!g||!currentUser)return;
+  editingId=id;['category','title','player_name','position','playstyle','formation','manager','tactics','content','image_url'].forEach(k=>$(k).value=g[k]||'');
+  $('progression').value=JSON.stringify(g.progression||{},null,2);$('published').checked=!!g.published;$('saveButton').textContent='Update guide';hideMessage('adminMessage');$('adminPanel').scrollIntoView({behavior:'smooth'});
 };
-
-$('loginToggle').onclick = () => {
-  if (currentUser) {
-    $('adminPanel').scrollIntoView({behavior:'smooth'});
-  } else {
-    $('loginPanel').classList.remove('hidden');
-    $('loginPanel').scrollIntoView({behavior:'smooth'});
-  }
+window.deleteGuide=async id=>{
+  if(!currentUser||!confirm('Delete this guide permanently?'))return;
+  const {error}=await db.from('guides').delete().eq('id',id);
+  if(error)return message('adminMessage','Delete failed: '+error.message);
+  message('adminMessage','Guide deleted.');await loadGuides();
 };
-$('cancelLogin').onclick = () => $('loginPanel').classList.add('hidden');
-
-$('loginForm').onsubmit = async e => {
-  e.preventDefault();
-  hideMessage('loginMessage');
-  const { data, error } = await db.auth.signInWithPassword({
-    email: $('email').value.trim(),
-    password: $('password').value
-  });
-  if (error) return message('loginMessage','Login failed. Check your email and password.');
-  currentUser = data.user;
-  $('loginPanel').classList.add('hidden');
-  $('password').value = '';
-  updatePanels();
-  await loadGuides();
+$('loginToggle').onclick=()=>{
+  if(currentUser){$('adminPanel').scrollIntoView({behavior:'smooth'})}
+  else{$('loginPanel').classList.remove('hidden');$('loginPanel').scrollIntoView({behavior:'smooth'})}
 };
-
-$('logoutButton').onclick = async () => {
-  await db.auth.signOut();
-  currentUser = null;
-  updatePanels();
-  resetForm();
-  await loadGuides();
+$('cancelLogin').onclick=()=>$('loginPanel').classList.add('hidden');
+$('loginForm').onsubmit=async e=>{
+  e.preventDefault();hideMessage('loginMessage');
+  const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+  if(error)return message('loginMessage','Login failed. Check your email, password and whether the account is confirmed.');
+  currentUser=data.user;$('loginPanel').classList.add('hidden');$('password').value='';updatePanels();await loadGuides();
 };
-
-$('guideForm').onsubmit = async e => {
-  e.preventDefault();
-  if (!currentUser) return message('adminMessage','Please sign in first.');
-  hideMessage('adminMessage');
-
-  let progression;
-  try {
-    progression = JSON.parse($('progression').value || '{}');
-  } catch {
-    return message('adminMessage','Progression details must be valid JSON. Use {} if not needed.');
-  }
-
-  const title = $('title').value.trim();
-  const record = {
-    category: $('category').value,
-    title,
-    slug: slugify(title),
-    player_name: $('player_name').value.trim() || null,
-    position: $('position').value.trim() || null,
-    playstyle: $('playstyle').value.trim() || null,
-    formation: $('formation').value.trim() || null,
-    manager: $('manager').value.trim() || null,
-    tactics: $('tactics').value.trim() || null,
-    progression,
-    content: $('content').value.trim(),
-    image_url: $('image_url').value.trim() || null,
-    published: $('published').checked,
-    updated_at: new Date().toISOString()
-  };
-
-  let result;
-  if (editingId) {
-    result = await db.from('guides').update(record).eq('id',editingId);
-  } else {
-    result = await db.from('guides').insert({...record, created_by:currentUser.id});
-  }
-
-  if (result.error) {
-    return message('adminMessage','Save failed: ' + result.error.message +
-      '. Check that the guide slug is unique.');
-  }
-  message('adminMessage',record.published ? 'Guide published!' : 'Guide saved as draft.');
-  resetForm();
-  await loadGuides();
+$('logoutButton').onclick=async()=>{
+  const {error}=await db.auth.signOut();if(error)return message('adminMessage','Sign out failed. Please try again.');
+  currentUser=null;updatePanels();resetForm();await loadGuides();
 };
-
-$('resetButton').onclick = resetForm;
+$('guideForm').onsubmit=async e=>{
+  e.preventDefault();if(!currentUser)return message('adminMessage','Please sign in first.');hideMessage('adminMessage');
+  let progression;try{progression=JSON.parse($('progression').value||'{}')}catch{return message('adminMessage','Progression details must be valid JSON. Example: {"Shooting": 8, "Dexterity": 10}.')}
+  const title=$('title').value.trim();
+  const record={category:$('category').value,title,slug:slugify(title),player_name:$('player_name').value.trim()||null,position:$('position').value.trim()||null,playstyle:$('playstyle').value.trim()||null,formation:$('formation').value.trim()||null,manager:$('manager').value.trim()||null,tactics:$('tactics').value.trim()||null,progression,content:$('content').value.trim(),image_url:$('image_url').value.trim()||null,published:$('published').checked,updated_at:new Date().toISOString()};
+  const result=editingId?await db.from('guides').update(record).eq('id',editingId):await db.from('guides').insert({...record,created_by:currentUser.id});
+  if(result.error)return message('adminMessage','Save failed: '+result.error.message+'. If the title already exists, change it slightly because each slug must be unique.');
+  message('adminMessage',record.published?'Guide published!':'Guide saved as draft.');resetForm();await loadGuides();
+};
+$('resetButton').onclick=resetForm;
 $('search').addEventListener('input',renderGuides);
-document.querySelectorAll('[data-filter]').forEach(button => {
-  button.onclick = () => {
-    activeFilter = button.dataset.filter;
-    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
-    button.classList.add('active');
-    renderGuides();
-  };
+$('positionFilter').addEventListener('change',renderGuides);
+document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>setCategory(button.dataset.filter)));
+db.auth.onAuthStateChange((_event,session)=>{
+  currentUser=session?.user||null;updatePanels();
+  // Avoid doing an awaited Supabase request inside the auth callback.
+  Promise.resolve().then(()=>loadGuides());
 });
-
-db.auth.onAuthStateChange((_event, session) => {
-  currentUser = session?.user || null;
-  updatePanels();
-  loadGuides();
-});
-
-updatePanels();
-loadGuides();
+updatePanels();loadGuides();
 </script>
 </body>
 </html>
