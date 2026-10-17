@@ -1,323 +1,1095 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#080b12">
-<title>CALWIU — eFootball Builds & Tactics</title>
-<meta name="description" content="Discover eFootball player progression builds, player stats, formations and tactical guides on CALWIU.">
-<meta property="og:title" content="CALWIU — eFootball Builds & Tactics">
-<meta property="og:description" content="Find player builds, progression guides and formations for eFootball.">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080808">
+<meta name="description" content="CALWIU eFootball player builds, progression points, formations and tactics.">
+<title>CALWIU | eFootball Builds & Tactics</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#080808;--panel:#111111;--panel2:#181818;--line:#303030;--green:#f2f0eb;--green2:#ffffff;--muted:#a3a3a3;--white:#f5f5f3;--red:#ff6978}
+:root{
+  color-scheme:dark;
+  --bg:#080808;--panel:#141414;--panel2:#1d1d1d;
+  --line:#343434;--white:#f5f5f3;--muted:#aaa;
+  --accent:#fff;--red:#ff7580;
+}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:84px}
-body{margin:0;background:var(--bg);color:var(--white);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input,select,textarea{font:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{margin:0;background:var(--bg);color:var(--white);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+body.locked{overflow:hidden}
+button,input,textarea,select{font:inherit}
 button{cursor:pointer}
 a{color:inherit;text-decoration:none}
+button:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:2px solid white;outline-offset:4px}
 .wrap{width:min(1180px,92%);margin:auto}
-.topbar{position:sticky;top:0;z-index:20;background:rgba(8,8,8,.92);backdrop-filter:blur(16px);border-bottom:1px solid #263342}
-.header{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:950;letter-spacing:3px;font-size:23px}
-.brand-mark{width:32px;height:32px;display:grid;place-items:center;background:#f2f0eb;color:#080808;border-radius:2px;font-size:18px;transform:skew(-8deg)}
-.brand span:last-child{color:#f2f0eb}
-.header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.btn{border:1px solid transparent;border-radius:3px;padding:11px 15px;font-weight:850;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.18s}
-.btn-primary{background:#f2f0eb;color:#080808}
-.btn-primary:hover{background:#ffffff;transform:translateY(-1px)}
-.btn-ghost{background:#171717;color:var(--white);border-color:#2b3948}
-.btn-ghost:hover{border-color:#eeeeee;color:#ffffff}
-.btn-danger{background:#4a2029;color:white}
-.hero{padding:78px 0 42px}
-.hero-box{position:relative;overflow:hidden;min-height:370px;border:1px solid #303030;border-radius:3px;padding:clamp(28px,6vw,72px);background:linear-gradient(105deg,rgba(8,8,8,.98),rgba(8,8,8,.76) 58%,rgba(8,8,8,.35)),radial-gradient(circle at 82% 28%,#454545,transparent 42%),linear-gradient(135deg,#1d1d1d,#090909)}
-.hero-box:after{content:"11";position:absolute;right:4%;bottom:-105px;font-size:clamp(200px,36vw,390px);line-height:1;font-weight:1000;letter-spacing:-25px;color:rgba(255,255,255,.035);pointer-events:none}
-.eyebrow{color:#c8c8c4;font-size:12px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase}
-.hero h1{position:relative;z-index:1;font-size:clamp(42px,8vw,92px);line-height:.91;letter-spacing:-4px;max-width:760px;margin:16px 0}
-.hero h1 em{font-style:normal;color:#f2f0eb}
-.hero p{position:relative;z-index:1;max-width:580px;color:#bac5ce;line-height:1.7;font-size:16px}
-.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px;position:relative;z-index:1}
-.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 0}
-.stat{border:1px solid var(--line);border-radius:14px;background:rgba(16,23,32,.8);padding:17px}
-.stat strong{display:block;font-size:23px;color:#f2f0eb}
-.stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
-.section{padding:32px 0}
-.section-head{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:18px;flex-wrap:wrap}
-.section-head h2{margin:5px 0 0;font-size:clamp(24px,4vw,34px);letter-spacing:-.8px}
-.section-head p{color:var(--muted);margin:7px 0 0;line-height:1.5}
-.toolbar{display:grid;grid-template-columns:minmax(180px,1fr) 190px;gap:10px;margin:20px 0 14px}
-.field,select,textarea{width:100%;border:1px solid #333333;background:#101010;color:var(--white);border-radius:3px;padding:13px 14px;outline:none}
-.field:focus,select:focus,textarea:focus{border-color:#eeeeee;box-shadow:0 0 0 3px rgba(255,255,255,.08)}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 20px}
-.tab{border:1px solid #303030;border-radius:2px;padding:10px 15px;background:#151515;color:#bac5d0;font-size:13px;font-weight:850}
-.tab.active{background:#f2f0eb;color:#080808;border-color:#eeeeee}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
-.guide-card{min-width:0;overflow:hidden;border:1px solid #2b2b2b;border-radius:3px;background:linear-gradient(180deg,#171717,#101010);transition:transform .18s,border-color .18s;cursor:pointer}
-.guide-card:hover{transform:translateY(-3px);border-color:#777777}
-.card-image{height:230px;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 10%,#303030,#151515 70%);display:grid;place-items:center}
-.card-image img{width:100%;height:100%;object-fit:cover;display:block}
-.card-placeholder{font-size:56px;font-weight:1000;color:rgba(255,255,255,.72);letter-spacing:-3px}
-.card-category{position:absolute;top:12px;left:12px;padding:7px 9px;border-radius:7px;background:rgba(6,10,14,.88);color:#f2f0eb;font-size:10px;letter-spacing:1px;font-weight:900;text-transform:uppercase}
-.card-rating{position:absolute;right:12px;top:12px;background:#f2f0eb;color:#080808;border-radius:8px;padding:7px 9px;font-weight:1000;font-size:13px}
-.card-body{padding:18px}
-.card-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:12px}
-.pill{padding:5px 8px;border-radius:6px;background:#222222;border:1px solid #373737}
-.guide-card h3{font-size:19px;line-height:1.3;margin:12px 0 8px;letter-spacing:-.3px}
-.card-desc{font-size:13px;line-height:1.55;color:var(--muted);margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.card-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;padding-top:13px;border-top:1px solid #263342;color:#d4dfeb;font-size:12px;font-weight:800}
-.arrow{color:#eeeeee;font-size:18px}
-.empty{grid-column:1/-1;text-align:center;border:1px dashed #344354;border-radius:16px;padding:40px 20px;color:var(--muted)}
-.empty strong{display:block;color:var(--white);font-size:18px;margin-bottom:7px}
-.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.feature{border:1px solid var(--line);border-radius:3px;background:linear-gradient(140deg,#191919,#101010);padding:23px}
-.feature-icon{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.08);display:grid;place-items:center;color:#f2f0eb;font-size:21px}
-.feature h3{margin:15px 0 7px}
-.feature p{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
-.panel{background:#111111;border:1px solid var(--line);border-radius:3px;padding:22px;margin:18px 0}
 .hidden{display:none!important}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
-.form-grid .full{grid-column:1/-1}
-label{display:block;font-size:12px;font-weight:800;color:#c6d0db;margin:9px 0 5px}
-input[type=checkbox]{width:auto;accent-color:#f2f0eb}
-.checkline{display:flex;align-items:center;gap:9px;margin:12px 0;color:#dbe3ea}
-.notice{padding:12px 14px;background:#202020;border:1px solid #3b3b3b;border-radius:10px;margin:12px 0;color:#dce7ef;overflow-wrap:anywhere}
-.detail-modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);padding:18px;display:none;overflow-y:auto}
+.muted{color:var(--muted)}
+.eyebrow{font-size:11px;letter-spacing:2.5px;font-weight:900;color:#bbb;text-transform:uppercase}
+.btn{
+  border:1px solid transparent;border-radius:5px;
+  padding:12px 17px;font-size:13px;font-weight:850;
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:8px;transition:.25s
+}
+.btn-primary{background:white;color:black}
+.btn-primary:hover{background:#ddd;transform:translateY(-2px)}
+.btn-ghost{background:#191919;color:white;border-color:#444}
+.btn-ghost:hover{background:#292929;border-color:#aaa}
+.btn-danger{background:#4c2027;color:white}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}
+
+/* HEADER */
+.topbar{
+  position:sticky;top:0;z-index:40;background:rgba(8,8,8,.94);
+  backdrop-filter:blur(18px);border-bottom:1px solid #292929
+}
+.header{height:75px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:11px}
+.brand-mark{
+  width:40px;height:40px;background:white;color:black;
+  display:grid;place-items:center;font-size:26px;font-weight:1000;
+  transform:skew(-9deg)
+}
+.brand-name{
+  font-size:clamp(25px,4vw,35px);font-weight:1000;
+  letter-spacing:3px;text-shadow:0 0 24px #ffffff44
+}
+.menu-holder{position:relative}
+.menu-button{
+  display:flex;align-items:center;gap:11px;background:#191919;
+  color:white;border:1px solid #444;padding:11px 15px;
+  border-radius:5px;font-weight:800
+}
+.hamburger{font-size:20px;line-height:1}
+.menu{
+  position:absolute;right:0;top:calc(100% + 12px);width:235px;
+  background:#191919;border:1px solid #444;border-radius:8px;
+  padding:8px;box-shadow:0 20px 60px #000c
+}
+.menu a,.menu button{
+  display:block;width:100%;text-align:left;background:transparent;
+  color:white;border:0;padding:14px;border-radius:5px;
+  font-size:13px;font-weight:800
+}
+.menu a:hover,.menu button:hover{background:#303030}
+
+/* HERO */
+.hero{padding:33px 0 22px}
+.hero-box{
+  position:relative;min-height:390px;overflow:hidden;
+  border:1px solid #444;border-radius:7px;
+  background:radial-gradient(ellipse at 75% 20%,#555 0%,#202020 34%,#080808 75%);
+  isolation:isolate
+}
+.stadium{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none
+}
+.stadium:before{
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(100deg,transparent 0 52px,#ffffff07 53px 54px);
+  opacity:.7
+}
+.light{
+  position:absolute;top:-45px;width:130px;height:350px;
+  background:linear-gradient(#ffffff70,transparent);
+  filter:blur(27px);transform-origin:top;
+  clip-path:polygon(35% 0,65% 0,100% 100%,0 100%);
+  animation:lights 7s ease-in-out infinite alternate
+}
+.light.one{left:38%;transform:rotate(25deg)}
+.light.two{right:8%;animation-delay:-3s;transform:rotate(-23deg)}
+@keyframes lights{
+  0%{opacity:.3;filter:blur(30px);rotate:-9deg}
+  100%{opacity:.85;filter:blur(18px);rotate:9deg}
+}
+.pitch{
+  position:absolute;bottom:-110px;left:-20%;width:140%;height:230px;
+  border:2px solid #ffffff19;border-radius:50%;
+  transform:perspective(300px) rotateX(58deg)
+}
+.poster-number{
+  position:absolute;right:7%;bottom:-75px;
+  font-size:clamp(240px,37vw,460px);font-weight:1000;
+  letter-spacing:-35px;line-height:1;color:#ffffff12;
+  animation:numberFloat 6s ease-in-out infinite
+}
+@keyframes numberFloat{
+  50%{transform:translateY(-13px);opacity:.7}
+}
+.poster-player{
+  position:absolute;right:15%;bottom:-20px;width:220px;height:310px;
+  opacity:.55;filter:drop-shadow(0 0 35px #ffffff45);
+  animation:playerFloat 5s ease-in-out infinite
+}
+.poster-player:before{
+  content:"";position:absolute;top:5px;left:78px;width:65px;height:72px;
+  border-radius:50%;background:linear-gradient(125deg,#bbb,#444)
+}
+.poster-player:after{
+  content:"";position:absolute;top:80px;left:28px;width:165px;height:240px;
+  background:linear-gradient(110deg,#777,#171717 55%,#aaa);
+  clip-path:polygon(32% 0,69% 0,100% 18%,87% 48%,79% 100%,20% 100%,12% 48%,0 18%);
+  border:1px solid #ffffff55
+}
+@keyframes playerFloat{50%{transform:translateY(-8px)}}
+.hero-content{
+  position:relative;z-index:2;padding:clamp(26px,6vw,65px);
+  max-width:770px
+}
+.hero h1{
+  font-size:clamp(49px,9vw,110px);line-height:.88;
+  letter-spacing:-4px;margin:20px 0 15px;font-weight:1000
+}
+.hero h1 span{color:white;text-shadow:0 0 35px #ffffff55}
+.hero p{max-width:440px;color:#ddd;line-height:1.65;font-size:14px}
+.hero-tag{letter-spacing:5px;font-size:12px;font-weight:900;color:#eee}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}
+.poster-bottom{
+  position:absolute;right:25px;bottom:20px;z-index:3;
+  font-size:10px;letter-spacing:3px;color:#ccc;font-weight:900
+}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.stat{background:#151515;border:1px solid #333;padding:18px;border-radius:5px}
+.stat strong{display:block;font-size:26px}
+.stat span{font-size:10px;letter-spacing:1.2px;color:#aaa;text-transform:uppercase}
+
+/* SECTIONS */
+.section{padding:38px 0}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:20px;flex-wrap:wrap}
+.section-head h2{font-size:clamp(26px,4vw,38px);letter-spacing:-1px;margin:8px 0}
+.section-head p{color:#aaa;font-size:13px;line-height:1.6}
+.toolbar{display:grid;grid-template-columns:1fr 190px;gap:10px;margin:20px 0}
+.field,select,textarea{
+  width:100%;padding:13px 14px;background:#131313;
+  border:1px solid #414141;color:white;border-radius:5px;outline:none
+}
+.field:focus,select:focus,textarea:focus{border-color:white}
+label{display:block;font-size:12px;color:#ccc;font-weight:800;margin:13px 0 6px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.tab{background:#191919;color:#ccc;border:1px solid #444;padding:10px 13px;border-radius:5px;font-weight:800;font-size:12px}
+.tab.active{background:white;color:black}
+
+/* CARDS */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.guide-card{
+  min-width:0;background:linear-gradient(160deg,#202020,#101010);
+  border:1px solid #363636;border-radius:7px;overflow:hidden;
+  cursor:pointer;transition:transform .35s,border-color .35s,box-shadow .35s;
+  animation:cardEnter .65s ease both,cardBreath 7s ease-in-out infinite
+}
+.guide-card:nth-child(2n){animation-delay:.12s,-2s}
+.guide-card:nth-child(3n){animation-delay:.22s,-4s}
+@keyframes cardEnter{
+  from{opacity:0;transform:translateY(18px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes cardBreath{
+  0%,100%{box-shadow:0 4px 18px #0005}
+  50%{box-shadow:0 8px 27px #ffffff0b}
+}
+.guide-card:hover{
+  transform:translateY(-7px);border-color:#aaa;
+  box-shadow:0 20px 40px #000b
+}
+.card-image{
+  position:relative;height:230px;overflow:hidden;
+  background:radial-gradient(circle at top,#484848,#151515 75%);
+  display:grid;place-items:center
+}
+.card-image img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.guide-card:hover img{transform:scale(1.055)}
+.card-placeholder{font-size:65px;font-weight:1000;color:#aaa}
+.card-category,.card-rating{
+  position:absolute;top:11px;padding:7px 9px;
+  font-size:10px;font-weight:900;border-radius:4px
+}
+.card-category{left:11px;background:#101010e8;color:white}
+.card-rating{right:11px;background:white;color:black}
+.card-body{padding:17px}
+.card-meta{display:flex;gap:6px;flex-wrap:wrap}
+.pill{background:#292929;border:1px solid #444;border-radius:4px;padding:5px 7px;font-size:10px;color:#ddd}
+.player-name{
+  display:block;font-size:clamp(20px,2.6vw,28px);
+  font-weight:1000;line-height:1.1;letter-spacing:-.8px;
+  color:#fff;margin:13px 0 5px;text-transform:uppercase;
+  text-shadow:0 0 20px #ffffff25;overflow-wrap:anywhere
+}
+.guide-card h3{font-size:14px;margin:8px 0;color:#d1d1d1;overflow-wrap:anywhere}
+.card-desc{
+  color:#aaa;font-size:12px;line-height:1.6;
+  display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden
+}
+.card-foot{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:14px;padding-top:13px;border-top:1px solid #333;
+  font-size:11px;font-weight:900;color:#ccc
+}
+.empty{grid-column:1/-1;padding:40px;text-align:center;border:1px dashed #444;color:#aaa}
+
+/* PROGRESSION */
+.progress-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.progress-item{background:#1b1b1b;border:1px solid #393939;padding:13px;border-radius:8px}
+.progress-top{display:flex;align-items:center;gap:10px}
+.progress-icon{
+  width:37px;height:37px;flex-shrink:0;background:#303030;
+  display:grid;place-items:center;border-radius:7px;font-size:19px
+}
+.progress-name{font-size:12px;font-weight:800;flex:1;overflow-wrap:anywhere}
+.progress-value{font-size:24px;font-weight:1000;color:white}
+.progress-track{height:5px;background:#393939;border-radius:10px;margin-top:12px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#888,#fff);border-radius:10px}
+
+/* FEATURES AND FORMS */
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.feature,.panel{
+  background:#151515;border:1px solid #363636;border-radius:7px;padding:23px
+}
+.feature h3{font-size:20px}
+.feature p{font-size:13px;line-height:1.7;color:#aaa}
+.feature-icon{font-size:29px}
+.panel{margin:20px 0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 15px}
+.full{grid-column:1/-1}
+.checkline{display:flex;align-items:center;gap:10px}
+.checkline input{accent-color:white}
+.notice{
+  background:#262626;border:1px solid #555;padding:12px;
+  margin:13px 0;border-radius:5px;font-size:13px;
+  line-height:1.5;overflow-wrap:anywhere
+}
+.admin-guide-row,.request-row{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:12px;padding:15px 0;border-bottom:1px solid #333;
+  overflow-wrap:anywhere
+}
+.admin-guide-row small,.request-row small{display:block;color:#aaa;margin-top:5px}
+.request-row p{font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;color:#ccc}
+.request-row>div:first-child{min-width:0;flex:1}
+
+/* MODAL */
+.detail-modal{
+  position:fixed;inset:0;z-index:60;background:#000d;
+  backdrop-filter:blur(9px);padding:12px;overflow-y:auto;display:none
+}
 .detail-modal.open{display:block}
-.modal-card{width:min(850px,100%);margin:30px auto;background:#0e151e;border:1px solid #334250;border-radius:20px;overflow:hidden;box-shadow:0 30px 100px #000}
-.modal-top{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
-.modal-content{padding:clamp(18px,4vw,32px)}
-.modal-hero{display:grid;grid-template-columns:220px 1fr;gap:22px;align-items:start}
-.modal-image{width:100%;height:260px;object-fit:cover;border-radius:13px;background:#202020}
-.modal-content h2{font-size:clamp(27px,5vw,42px);line-height:1.05;margin:10px 0}
-.detail-label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1.4px;font-weight:900}
-.detail-chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-.detail-chips span{padding:7px 9px;background:#222222;border:1px solid #393939;border-radius:8px;font-size:12px}
-.detail-section{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
-.detail-section h3{margin:0 0 12px}
-.detail-copy{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;color:#c5d0db}
-.stat-list{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
-.stat-item{background:#1c1c1c;border:1px solid #333333;border-radius:10px;padding:12px}
-.stat-item span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.8px}
-.stat-item strong{display:block;margin-top:5px;overflow-wrap:anywhere}
-.admin-guide-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
-.admin-guide-row:last-child{border-bottom:0}
-.admin-guide-row small{display:block;color:var(--muted);margin-top:4px}
-footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);font-size:13px;margin-top:30px}
+.modal-card{
+  width:min(850px,100%);margin:25px auto;background:#111;
+  border:1px solid #444;border-radius:10px;overflow:hidden
+}
+.modal-top{display:flex;align-items:center;justify-content:space-between;padding:13px 17px;border-bottom:1px solid #333}
+.modal-content{padding:clamp(17px,4vw,30px)}
+.modal-hero{display:grid;grid-template-columns:220px 1fr;gap:22px}
+.modal-image{width:100%;height:260px;object-fit:cover;background:#292929;border-radius:6px}
+.modal-content h2{font-size:clamp(28px,5vw,43px);margin:9px 0;overflow-wrap:anywhere}
+.detail-label{font-size:11px;letter-spacing:2px;color:#aaa;font-weight:900}
+.detail-chips{display:flex;gap:7px;flex-wrap:wrap;margin:13px 0}
+.detail-chips span{background:#292929;border:1px solid #444;padding:7px;border-radius:5px;font-size:11px}
+.detail-copy{white-space:pre-wrap;overflow-wrap:anywhere;color:#bbb;line-height:1.7;font-size:13px}
+.detail-section{border-top:1px solid #333;padding-top:20px;margin-top:23px}
+footer{border-top:1px solid #333;padding:30px 0;margin-top:30px;color:#aaa;font-size:12px}
 .footer-inner{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
-@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.card-image{height:170px}.hero{padding-top:35px}}
-@media(max-width:560px){.wrap{width:91%}.header{min-height:64px}.brand{font-size:21px}.brand-mark{width:30px;height:30px}.header-actions .btn{padding:9px 10px;font-size:12px}.hero-box{border-radius:18px;min-height:0;padding:28px 21px}.hero h1{letter-spacing:-1.6px}.stat-row{gap:7px}.stat{padding:12px 9px}.stat strong{font-size:19px}.stat span{font-size:9px;letter-spacing:.5px}.toolbar{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.card-image{height:155px}.card-body{padding:11px}.guide-card h3{font-size:15px;margin:9px 0 6px}.card-meta{font-size:10px}.card-desc{font-size:12px}.card-foot{font-size:10px;margin-top:12px;padding-top:10px}.card-rating{font-size:11px;top:8px;right:8px;padding:5px 7px}.card-category{top:8px;left:8px;padding:5px 6px;font-size:8px}.feature-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.panel{padding:15px}.modal-hero{grid-template-columns:1fr}.modal-image{height:230px;max-width:100%}.detail-modal{padding:8px}.modal-card{margin:10px auto}.stat-list{grid-template-columns:1fr 1fr}}
+
+@media(max-width:850px){
+.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card-image{height:185px}
+}
+@media(max-width:560px){
+.wrap{width:92%}
+.header{height:65px}
+.brand-name{font-size:25px;letter-spacing:2px}
+.brand-mark{width:34px;height:34px;font-size:21px}
+.menu-button{font-size:12px;padding:10px}
+.hero{padding-top:18px}
+.hero-box{min-height:390px}
+.hero-content{padding:27px 19px}
+.hero h1{font-size:59px;letter-spacing:-2px}
+.hero p{max-width:265px;font-size:12px}
+.poster-player{right:-45px;opacity:.24}
+.poster-number{right:0;font-size:260px}
+.poster-bottom{font-size:8px}
+.stat-row{gap:7px}
+.stat{padding:12px 8px}
+.stat strong{font-size:20px}
+.stat span{font-size:9px;letter-spacing:0}
+.toolbar{grid-template-columns:1fr}
+.grid{gap:9px}
+.card-image{height:155px}
+.card-body{padding:11px}
+.player-name{font-size:19px}
+.guide-card h3{font-size:12px}
+.card-desc{font-size:11px}
+.card-category,.card-rating{font-size:8px;padding:5px}
+.feature-grid,.form-grid{grid-template-columns:1fr}
+.full{grid-column:auto}
+.panel{padding:15px}
+.modal-hero{grid-template-columns:1fr}
+.modal-image{height:230px;object-fit:contain}
+.progress-grid{gap:7px}
+.progress-item{padding:9px}
+.progress-icon{width:29px;height:29px;font-size:15px}
+.progress-name{font-size:10px}
+.progress-value{font-size:20px}
+.request-row{align-items:flex-start;flex-direction:column}
+}
+@media(prefers-reduced-motion:reduce){
+*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
 </style>
 </head>
 <body>
+
 <div class="topbar">
-  <header class="header wrap">
-    <a class="brand" href="#" aria-label="CALWIU home"><span class="brand-mark">C</span><span>CALWIU</span></a>
-    <div class="header-actions">
-      <a class="btn btn-ghost" href="#guides">Explore Builds</a>
-      <button class="btn btn-primary" id="loginToggle">Admin Login</button>
-    </div>
-  </header>
+<header class="header wrap">
+<a class="brand" href="#home" aria-label="CALWIU Home">
+<span class="brand-mark">C</span>
+<span class="brand-name">CALWIU</span>
+</a>
+<div class="menu-holder">
+<button class="menu-button" id="menuButton" aria-expanded="false" aria-controls="mainMenu">
+<span class="hamburger">☰</span> MENU
+</button>
+<nav class="menu hidden" id="mainMenu" aria-label="Main navigation">
+<a href="#guides">Explore Builds</a>
+<a href="#formations">Formations</a>
+<a href="#request">Request a Build</a>
+<button id="loginToggle" type="button">Admin Login</button>
+</nav>
 </div>
+</header>
+</div>
+
 <main class="wrap">
-  <section class="hero" id="home">
-    <div class="hero-box">
-      <div class="eyebrow">eFootball Builds & Tactics</div>
-      <h1>KNOW YOUR<br><em>GAME.</em></h1>
-      <p>A considered library of eFootball player builds, squad formations and tactical guides. Find your setup. Understand the details. Make every point count.</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="#guides">Explore Player Builds <span>↗</span></a>
-        <a class="btn btn-ghost" href="#formations">Explore Formations</a>
-      </div>
-    </div>
-    <div class="stat-row">
-      <div class="stat"><strong id="progressionCount">—</strong><span>Player builds</span></div>
-      <div class="stat"><strong id="formationCount">—</strong><span>Formation guides</span></div>
-      <div class="stat"><strong>24/7</strong><span>Build library</span></div>
-    </div>
-  </section>
 
-  <section class="section" id="guides">
-    <div class="section-head">
-      <div><div class="eyebrow">The guide library</div><h2>Find your next build.</h2><p>Search players, positions, playstyles and formations.</p></div>
-    </div>
-    <div class="toolbar">
-      <input class="field" id="search" type="search" placeholder="⌕  Search player, manager, formation..." aria-label="Search guides">
-      <select id="positionFilter" aria-label="Filter by position">
-        <option value="all">All positions</option><option>GK</option><option>CB</option><option>LB</option><option>RB</option><option>DMF</option><option>CMF</option><option>AMF</option><option>LMF</option><option>RMF</option><option>LWF</option><option>RWF</option><option>SS</option><option>CF</option>
-      </select>
-    </div>
-    <div class="tabs" role="tablist" aria-label="Guide category">
-      <button class="tab active" data-filter="all">All Guides</button>
-      <button class="tab" data-filter="progression">Player Progressions</button>
-      <button class="tab" data-filter="formation">Best Formations</button>
-    </div>
-    <div id="guideGrid" class="grid" aria-live="polite"></div>
-    <p id="publicMessage" class="muted"></p>
-  </section>
+<section class="hero" id="home">
+<div class="hero-box">
+<div class="stadium" aria-hidden="true">
+<div class="light one"></div><div class="light two"></div>
+<div class="pitch"></div>
+<div class="poster-number">10</div>
+<div class="poster-player"></div>
+</div>
+<div class="hero-content">
+<div class="eyebrow">CALWIU PRESENTS / EFOOTBALL</div>
+<h1>SAFWAN<br><span>#10</span></h1>
+<div class="hero-tag">THE GAME IS YOURS.</div>
+<p>Premium eFootball player builds, progression guides and tactical formations. Built for players who want more from every match.</p>
+<div class="hero-actions">
+<a class="btn btn-primary" href="#guides">EXPLORE BUILDS ↗</a>
+<a class="btn btn-ghost" href="#request">REQUEST BUILD</a>
+</div>
+</div>
+<div class="poster-bottom">CALWIU / PLAYER EDITION</div>
+</div>
+<div class="stat-row">
+<div class="stat"><strong id="progressionCount">—</strong><span>Player builds</span></div>
+<div class="stat"><strong id="formationCount">—</strong><span>Formations</span></div>
+<div class="stat"><strong>10</strong><span>SAFWAN EDITION</span></div>
+</div>
+</section>
 
-  <section class="section" id="formations">
-    <div class="section-head"><div><div class="eyebrow">Play with a plan</div><h2>More than just a formation.</h2><p>Understand the setup, roles and tactics behind the squad.</p></div></div>
-    <div class="feature-grid">
-      <article class="feature"><div class="feature-icon">⌘</div><h3>Player Progressions</h3><p>Browse player-specific builds, position, playstyle and progression point recommendations. Open a guide to read the full build.</p><div style="margin-top:17px"><button class="btn btn-ghost" onclick="setCategory('progression')">Browse Progressions ↗</button></div></article>
-      <article class="feature"><div class="feature-icon">⚽</div><h3>Best Formations</h3><p>Explore formation guides with manager details, squad tactics, attacking approach and defensive setup.</p><div style="margin-top:17px"><button class="btn btn-ghost" onclick="setCategory('formation')">Browse Formations ↗</button></div></article>
-    </div>
-  </section>
+<section class="section" id="guides">
+<div class="section-head">
+<div>
+<div class="eyebrow">THE CALWIU LIBRARY</div>
+<h2>Explore Player Builds.</h2>
+<p>Find your player. Discover the progression. Master the game.</p>
+</div>
+</div>
+<div class="toolbar">
+<input class="field" id="search" type="search" placeholder="Search player, formation, playstyle..." aria-label="Search guides">
+<select id="positionFilter" aria-label="Position filter">
+<option value="all">All positions</option>
+<option>GK</option><option>CB</option><option>LB</option><option>RB</option>
+<option>DMF</option><option>CMF</option><option>AMF</option>
+<option>LMF</option><option>RMF</option><option>LWF</option>
+<option>RWF</option><option>SS</option><option>CF</option>
+</select>
+</div>
+<div class="tabs" aria-label="Guide categories">
+<button class="tab active" data-filter="all">All Guides</button>
+<button class="tab" data-filter="progression">Player Progressions</button>
+<button class="tab" data-filter="formation">Best Formations</button>
+</div>
+<div class="grid" id="guideGrid" aria-live="polite"></div>
+<p class="muted" id="publicMessage" role="status"></p>
+</section>
 
-  <section id="loginPanel" class="panel hidden">
-    <div class="section-head"><div><div class="eyebrow">Restricted access</div><h2>Admin sign in</h2><p>Only the authorised CALWIU admin account can manage guides.</p></div></div>
-    <form id="loginForm">
-      <label for="email">Email</label><input class="field" id="email" type="email" autocomplete="username" required>
-      <label for="password">Password</label><input class="field" id="password" type="password" autocomplete="current-password" required>
-      <div class="actions"><button class="btn btn-primary" type="submit">Sign in</button><button class="btn btn-ghost" type="button" id="cancelLogin">Cancel</button></div>
-    </form>
-    <div id="loginMessage" class="notice hidden"></div>
-  </section>
+<section class="section" id="formations">
+<div class="section-head">
+<div><div class="eyebrow">TACTICAL INTELLIGENCE</div>
+<h2>Play With A Plan.</h2>
+<p>Explore progression recommendations and winning formations.</p></div>
+</div>
+<div class="feature-grid">
+<article class="feature">
+<div class="feature-icon">⚽</div>
+<h3>Player Progressions</h3>
+<p>Discover individual builds, player roles, progression points and playstyles.</p>
+<div class="actions"><button class="btn btn-ghost" onclick="setCategory('progression')">Browse Builds ↗</button></div>
+</article>
+<article class="feature">
+<div class="feature-icon">▦</div>
+<h3>Best Formations</h3>
+<p>Explore managers, squad setups, attacking systems and defensive tactics.</p>
+<div class="actions"><button class="btn btn-ghost" onclick="setCategory('formation')">Browse Formations ↗</button></div>
+</article>
+</div>
+</section>
 
-  <section id="adminPanel" class="panel hidden">
-    <div class="section-head"><div><div class="eyebrow">Content management</div><h2>CALWIU Admin</h2><p>Add a guide, save it as a draft, or publish it for visitors.</p></div><button id="logoutButton" class="btn btn-ghost">Sign out</button></div>
-    <form id="guideForm">
-      <div class="form-grid">
-        <div><label for="category">Guide category</label><select id="category"><option value="progression">Player Progression</option><option value="formation">Best Formation</option></select></div>
-        <div><label for="title">Guide title *</label><input class="field" id="title" required placeholder="e.g. Epic Striker — Finishing Build"></div>
-        <div><label for="player_name">Player name</label><input class="field" id="player_name" placeholder="Player name"></div>
-        <div><label for="position">Position</label><input class="field" id="position" placeholder="e.g. CF"></div>
-        <div><label for="playstyle">Playstyle</label><input class="field" id="playstyle" placeholder="e.g. Goal Poacher"></div>
-        <div><label for="formation">Formation</label><input class="field" id="formation" placeholder="e.g. 4-2-1-3"></div>
-        <div><label for="manager">Manager</label><input class="field" id="manager" placeholder="Manager name"></div>
-        <div><label for="image_url">Image URL</label><input class="field" id="image_url" type="url" placeholder="https://..."></div>
-        <div class="full"><label for="tactics">Squad tactics / manager instructions</label><textarea id="tactics" rows="3" placeholder="Attacking style, defensive approach, player instructions..."></textarea></div>
-        <div class="full"><label for="progression">Progression details (JSON)</label><textarea id="progression" rows="4">{"Shooting": 8, "Passing": 6}</textarea><p class="muted" style="font-size:12px;margin-top:-8px">Enter valid JSON, e.g. {"Shooting": 8, "Dexterity": 10}. For formations, use {} if not needed.</p></div>
-        <div class="full"><label for="content">Guide content *</label><textarea id="content" rows="5" required placeholder="Explain why this build works, player role, strengths and how to use it..."></textarea></div>
-      </div>
-      <label class="checkline"><input id="published" type="checkbox"> Publish this guide for public visitors</label>
-      <div class="actions"><button class="btn btn-primary" type="submit" id="saveButton">Save guide</button><button class="btn btn-ghost" type="button" id="resetButton">Clear form</button></div>
-    </form>
-    <div id="adminMessage" class="notice hidden"></div>
-    <div class="detail-section"><h3>Manage guides</h3><div id="adminGuideList"></div></div>
-  </section>
+<section class="section" id="request">
+<div class="section-head">
+<div>
+<div class="eyebrow">YOUR PLAYER / YOUR BUILD</div>
+<h2>Request A Build.</h2>
+<p>Can't find your player? Send a request to CALWIU.</p>
+</div>
+</div>
+<div class="panel">
+<form id="requestForm">
+<div class="form-grid">
+<div>
+<label for="requestPlayer">Player name *</label>
+<input class="field" id="requestPlayer" required maxlength="120" placeholder="e.g. Kylian Mbappé">
+</div>
+<div>
+<label for="requestPosition">Position (optional)</label>
+<select id="requestPosition">
+<option value="">Select position</option>
+<option>GK</option><option>CB</option><option>LB</option><option>RB</option>
+<option>DMF</option><option>CMF</option><option>AMF</option>
+<option>LMF</option><option>RMF</option><option>LWF</option>
+<option>RWF</option><option>SS</option><option>CF</option>
+</select>
+</div>
+<div>
+<label for="requestVersion">Card version (optional)</label>
+<input class="field" id="requestVersion" maxlength="120" placeholder="Epic / Big Time / Highlight...">
+</div>
+<div>
+<label for="requestContact">Contact (optional)</label>
+<input class="field" id="requestContact" maxlength="180" placeholder="Email or social username">
+</div>
+<div class="full">
+<label for="requestNotes">Additional notes (optional)</label>
+<textarea id="requestNotes" rows="4" maxlength="1500" placeholder="Tell us which build or playstyle you need..."></textarea>
+</div>
+</div>
+<div class="actions">
+<button class="btn btn-primary" type="submit" id="requestSubmit">SEND REQUEST ↗</button>
+</div>
+<div class="notice hidden" id="requestMessage" role="status"></div>
+</form>
+</div>
+</section>
+
+<section class="panel hidden" id="loginPanel">
+<div class="section-head">
+<div><div class="eyebrow">RESTRICTED ACCESS</div><h2>Admin Login</h2>
+<p>Authorised CALWIU administrators only.</p></div>
+</div>
+<form id="loginForm">
+<label for="email">Email</label>
+<input class="field" id="email" type="email" autocomplete="username" required>
+<label for="password">Password</label>
+<input class="field" id="password" type="password" autocomplete="current-password" required>
+<div class="actions">
+<button class="btn btn-primary" type="submit" id="signInButton">Sign In</button>
+<button class="btn btn-ghost" type="button" id="cancelLogin">Cancel</button>
+</div>
+</form>
+<div class="notice hidden" id="loginMessage" role="status"></div>
+</section>
+
+<section class="panel hidden" id="adminPanel">
+<div class="section-head">
+<div><div class="eyebrow">CONTENT MANAGEMENT</div><h2>CALWIU Admin Panel</h2>
+<p>Manage player builds, formations and visitor requests.</p></div>
+<button class="btn btn-ghost" id="logoutButton">Sign Out</button>
+</div>
+
+<form id="guideForm">
+<div class="form-grid">
+<div>
+<label for="category">Guide category</label>
+<select id="category">
+<option value="progression">Player Progression</option>
+<option value="formation">Best Formation</option>
+</select>
+</div>
+<div>
+<label for="title">Guide title *</label>
+<input class="field" id="title" required maxlength="200" placeholder="Epic Striker — Finishing Build">
+</div>
+<div><label for="player_name">Player name</label><input class="field" id="player_name"></div>
+<div><label for="position">Position</label><input class="field" id="position" placeholder="CF"></div>
+<div><label for="playstyle">Playstyle</label><input class="field" id="playstyle" placeholder="Goal Poacher"></div>
+<div><label for="formation">Formation</label><input class="field" id="formation" placeholder="4-2-2-2"></div>
+<div><label for="manager">Manager</label><input class="field" id="manager"></div>
+<div><label for="image_url">Image URL</label><input class="field" id="image_url" type="url" placeholder="https://..."></div>
+<div class="full">
+<label for="tactics">Squad tactics / manager instructions</label>
+<textarea id="tactics" rows="3"></textarea>
+</div>
+<div class="full">
+<label for="progression">Progression details (JSON)</label>
+<textarea id="progression" rows="6">{"Shooting":8,"Passing":4,"Dribbling":8,"Dexterity":10,"Lower Body Strength":8,"Aerial Strength":4,"Defending":0}</textarea>
+<p class="muted" style="font-size:12px">Enter valid JSON. Use {} for formations.</p>
+</div>
+<div class="full">
+<label for="content">Guide content *</label>
+<textarea id="content" rows="5" required></textarea>
+</div>
+</div>
+<label class="checkline"><input id="published" type="checkbox"> Publish this guide</label>
+<div class="actions">
+<button class="btn btn-primary" id="saveButton" type="submit">Save Guide</button>
+<button class="btn btn-ghost" id="resetButton" type="button">Clear Form</button>
+</div>
+</form>
+<div class="notice hidden" id="adminMessage" role="status"></div>
+<div class="detail-section">
+<h3>Manage Guides</h3>
+<div id="adminGuideList"></div>
+</div>
+
+<div class="detail-section" id="adminRequests">
+<div class="section-head">
+<div><div class="eyebrow">VISITOR SUBMISSIONS</div><h2>Build Requests</h2></div>
+<button class="btn btn-ghost" id="refreshRequests">Refresh Requests</button>
+</div>
+<div id="requestList" aria-live="polite"></div>
+</div>
+</section>
+
 </main>
-<footer><div class="wrap footer-inner"><div><strong style="color:#f2f0eb;letter-spacing:2px">CALWIU</strong><p>A player-first library for eFootball builds and tactics.</p></div><div>Independent fan guide. Not affiliated with KONAMI.</div></div></footer>
+
+<footer>
+<div class="wrap footer-inner">
+<div><strong style="color:white;letter-spacing:3px;font-size:19px">CALWIU</strong>
+<p>eFootball builds, progression and tactical intelligence.</p></div>
+<div>Independent fan guide. Not affiliated with KONAMI.</div>
+</div>
+</footer>
 
 <div class="detail-modal" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
-  <div class="modal-card">
-    <div class="modal-top"><span class="eyebrow">CALWIU GUIDE</span><button class="btn btn-ghost" id="closeDetail" aria-label="Close guide">✕ Close</button></div>
-    <div class="modal-content" id="detailContent"></div>
-  </div>
+<div class="modal-card">
+<div class="modal-top">
+<span class="eyebrow">CALWIU / GUIDE DETAILS</span>
+<button class="btn btn-ghost" id="closeDetail">✕ Close</button>
 </div>
+<div class="modal-content" id="detailContent"></div>
+</div>
+</div>
+
 <script>
-const SUPABASE_URL = 'https://tolxyznfykrstnrpzgen.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_bTAD_fpX7ocWRY_e7tQ9gA_B36v3S_k';
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let currentUser = null, guides = [], activeFilter = 'all', editingId = null;
-const $ = id => document.getElementById(id);
-const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function message(id,text){$(id).textContent=text;$(id).classList.remove('hidden')}
+"use strict";
+
+/* EXISTING SUPABASE CONNECTION */
+const SUPABASE_URL='https://tolxyznfykrstnrpzgen.supabase.co';
+const SUPABASE_KEY='sb_publishable_bTAD_fpX7ocWRY_e7tQ9gA_B36v3S_k';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const $=id=>document.getElementById(id);
+const escapeHTML=v=>String(v??'').replace(/[&<>"']/g,c=>({
+'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+}[c]));
+
+let currentUser=null;
+let isAdmin=false;
+let guides=[];
+let activeFilter='all';
+let editingId=null;
+let authVersion=0;
+let lastDetailFocus=null;
+
+function message(id,text){
+ $(id).textContent=text;
+ $(id).classList.remove('hidden');
+}
 function hideMessage(id){$(id).classList.add('hidden')}
-function slugify(value){return value.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'guide'}
+function slugify(v){
+ return v.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'guide';
+}
+function getInitials(g){
+ return (g.player_name||g.title||'CW').trim().split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase();
+}
+function scrollToId(id){
+ $(id).scrollIntoView({behavior:'smooth'});
+}
+function closeMenu(){
+ $('mainMenu').classList.add('hidden');
+ $('menuButton').setAttribute('aria-expanded','false');
+}
+$('menuButton').onclick=()=>{
+ const opened=$('mainMenu').classList.toggle('hidden')===false;
+ $('menuButton').setAttribute('aria-expanded',String(opened));
+};
+document.addEventListener('click',e=>{
+ if(!e.target.closest('.menu-holder'))closeMenu();
+});
+document.querySelectorAll('#mainMenu a').forEach(a=>a.addEventListener('click',closeMenu));
+
 function updatePanels(){
-  $('adminPanel').classList.toggle('hidden',!currentUser);
-  $('loginToggle').textContent=currentUser?'Admin Panel':'Admin Login';
+ $('adminPanel').classList.toggle('hidden',!isAdmin);
+ $('loginToggle').textContent=isAdmin?'Admin Panel':'Admin Login';
+ if(!isAdmin)$('adminGuideList').replaceChildren();
 }
+
+async function verifyAdmin(user){
+ if(!user)return false;
+ const {data,error}=await db.from('calwiu_admins')
+  .select('user_id').eq('user_id',user.id).maybeSingle();
+ if(error){console.error('Admin verification:',error.message);return false}
+ return !!data;
+}
+
+async function syncAuth(session){
+ const version=++authVersion;
+ const user=session?.user||null;
+ const allowed=await verifyAdmin(user);
+ if(version!==authVersion)return;
+ currentUser=user;
+ isAdmin=allowed;
+ updatePanels();
+ if(isAdmin){
+  $('loginPanel').classList.add('hidden');
+  await loadGuides();
+  await loadRequests();
+ }else{
+  editingId=null;
+  $('adminPanel').classList.add('hidden');
+  $('requestList').replaceChildren();
+  await loadGuides();
+ }
+}
+
 function updateStats(){
-  $('progressionCount').textContent=guides.filter(g=>g.category==='progression'&&g.published).length;
-  $('formationCount').textContent=guides.filter(g=>g.category==='formation'&&g.published).length;
+ const published=guides.filter(g=>g.published);
+ $('progressionCount').textContent=published.filter(g=>g.category==='progression').length;
+ $('formationCount').textContent=published.filter(g=>g.category==='formation').length;
 }
-function getInitials(g){const name=(g.player_name||g.title||'CW').trim();return name.split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase()}
+
 async function loadGuides(){
-  $('publicMessage').textContent='Loading guide library...';
-  const {data,error}=await db.from('guides').select('*').order('created_at',{ascending:false});
-  if(error){$('publicMessage').textContent='Could not load guides. Please refresh and try again.';console.error(error);return}
-  guides=data||[];updateStats();renderGuides();renderAdminGuides();
+ $('publicMessage').textContent='Loading guide library...';
+ const {data,error}=await db.from('guides').select('*').order('created_at',{ascending:false});
+ if(error){
+  $('publicMessage').textContent='Unable to load guides. Please refresh.';
+  console.error(error);
+  return;
+ }
+ guides=data||[];
+ updateStats();
+ renderGuides();
+ renderAdminGuides();
 }
+
 function renderGuides(){
-  const term=$('search').value.trim().toLowerCase(),pos=$('positionFilter').value.toLowerCase();
-  const visible=guides.filter(g=>(currentUser||g.published)&&(activeFilter==='all'||g.category===activeFilter)&&
-    (pos==='all'||String(g.position||'').toLowerCase().split(/[\/, -]+/).includes(pos))&&
-    [g.title,g.player_name,g.position,g.playstyle,g.formation,g.manager,g.content].some(v=>String(v||'').toLowerCase().includes(term)));
-  $('guideGrid').innerHTML=visible.map(g=>{
-    const image=g.image_url?`<img src="${escapeHTML(g.image_url)}" alt="${escapeHTML(g.player_name||g.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">`:'';
-    const draft=currentUser&&!g.published?'<span class="pill">Draft</span>':'';
-    const subtitle=g.category==='progression'?(g.position||'Player build'):(g.formation||'Tactics guide');
-    return `<article class="guide-card" tabindex="0" role="button" aria-label="Open ${escapeHTML(g.title)}" onclick="showGuide('${g.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showGuide('${g.id}')}">
-      <div class="card-image">${image}<div class="card-placeholder" style="${g.image_url?'display:none':''}">${escapeHTML(getInitials(g))}</div><span class="card-category">${g.category==='progression'?'Player Build':'Formation Guide'}</span>${g.position?`<span class="card-rating">${escapeHTML(g.position)}</span>`:''}</div>
-      <div class="card-body"><div class="card-meta"><span class="pill">${escapeHTML(subtitle)}</span>${g.playstyle?`<span class="pill">${escapeHTML(g.playstyle)}</span>`:''}${draft}</div><h3>${escapeHTML(g.title)}</h3><p class="card-desc">${escapeHTML(g.content||'Open this guide to view details.')}</p><div class="card-foot"><span>${escapeHTML(g.player_name||g.manager||'CALWIU GUIDE')}</span><span class="arrow">↗</span></div>
-      ${currentUser?`<div class="actions" onclick="event.stopPropagation()"><button class="btn btn-ghost" onclick="editGuide('${g.id}')">Edit</button><button class="btn btn-danger" onclick="deleteGuide('${g.id}')">Delete</button></div>`:''}</div></article>`;
-  }).join('');
-  $('publicMessage').textContent=visible.length?'Showing '+visible.length+' guide'+(visible.length===1?'':'s')+'.':'No guides match this search yet.';
+ const term=$('search').value.trim().toLowerCase();
+ const pos=$('positionFilter').value.toLowerCase();
+ const visible=guides.filter(g=>
+  (isAdmin||g.published)&&
+  (activeFilter==='all'||g.category===activeFilter)&&
+  (pos==='all'||String(g.position||'').toLowerCase().split(/[\/, -]+/).includes(pos))&&
+  [g.title,g.player_name,g.position,g.playstyle,g.formation,g.manager,g.content]
+   .some(v=>String(v||'').toLowerCase().includes(term))
+ );
+ const grid=$('guideGrid');
+ grid.innerHTML=visible.map(g=>{
+  const image=g.image_url
+   ?`<img src="${escapeHTML(g.image_url)}" alt="${escapeHTML(g.player_name||g.title)}" loading="lazy">`
+   :'';
+  const subtitle=g.category==='progression'?(g.position||'Player Build'):(g.formation||'Formation');
+  return `
+  <article class="guide-card" tabindex="0" role="button"
+    data-id="${escapeHTML(g.id)}" aria-label="Open ${escapeHTML(g.title)}">
+   <div class="card-image">
+    ${image}
+    <div class="card-placeholder" ${image?'style="display:none"':''}>${escapeHTML(getInitials(g))}</div>
+    <span class="card-category">${g.category==='progression'?'PLAYER BUILD':'FORMATION'}</span>
+    ${g.position?`<span class="card-rating">${escapeHTML(g.position)}</span>`:''}
+   </div>
+   <div class="card-body">
+    <div class="card-meta">
+     <span class="pill">${escapeHTML(subtitle)}</span>
+     ${g.playstyle?`<span class="pill">${escapeHTML(g.playstyle)}</span>`:''}
+     ${isAdmin&&!g.published?'<span class="pill">DRAFT</span>':''}
+    </div>
+    <strong class="player-name">${escapeHTML(g.player_name||g.title)}</strong>
+    <h3>${escapeHTML(g.title)}</h3>
+    <p class="card-desc">${escapeHTML(g.content||'Open this guide to explore the full build.')}</p>
+    <div class="card-foot"><span>VIEW FULL GUIDE</span><span>↗</span></div>
+    ${isAdmin?`<div class="actions">
+     <button class="btn btn-ghost" data-action="edit" data-id="${escapeHTML(g.id)}">Edit</button>
+     <button class="btn btn-danger" data-action="delete" data-id="${escapeHTML(g.id)}">Delete</button>
+    </div>`:''}
+   </div>
+  </article>`;
+ }).join('');
+ $('publicMessage').textContent=visible.length?
+  `Showing ${visible.length} guide${visible.length===1?'':'s'}.`:
+  'No guides match your search yet.';
+
+ grid.querySelectorAll('.card-image img').forEach(img=>{
+  img.addEventListener('error',()=>{
+   img.style.display='none';
+   const placeholder=img.nextElementSibling;
+   if(placeholder)placeholder.style.display='grid';
+  });
+ });
 }
+
+$('guideGrid').addEventListener('click',e=>{
+ const action=e.target.closest('[data-action]');
+ if(action){
+  const id=action.dataset.id;
+  if(action.dataset.action==='edit')editGuide(id);
+  if(action.dataset.action==='delete')deleteGuide(id);
+  return;
+ }
+ const card=e.target.closest('.guide-card');
+ if(card)showGuide(card.dataset.id);
+});
+$('guideGrid').addEventListener('keydown',e=>{
+ if(e.target.classList.contains('guide-card')&&(e.key==='Enter'||e.key===' ')){
+  e.preventDefault();showGuide(e.target.dataset.id);
+ }
+});
+
 function setCategory(category){
-  activeFilter=category;document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b.dataset.filter===category));
-  $('search').value='';$('positionFilter').value='all';renderGuides();$('guides').scrollIntoView({behavior:'smooth'});
+ activeFilter=category;
+ document.querySelectorAll('[data-filter]').forEach(b=>
+  b.classList.toggle('active',b.dataset.filter===category)
+ );
+ $('search').value='';
+ $('positionFilter').value='all';
+ renderGuides();
+ scrollToId('guides');
 }
 window.setCategory=setCategory;
+
+const progressionIcons={
+ 'shooting':'◎',
+ 'passing':'↗',
+ 'dribbling':'◈',
+ 'dexterity':'⚡',
+ 'lower body strength':'↟',
+ 'aerial strength':'↑',
+ 'defending':'⬡',
+ 'goalkeeping 1':'▣',
+ 'goalkeeping 2':'▣',
+ 'goalkeeping 3':'▣'
+};
 function progressionHTML(value){
-  if(!value||typeof value!=='object'||!Object.keys(value).length)return '<p class="detail-copy">No progression points added to this guide yet.</p>';
-  return `<div class="stat-list">${Object.entries(value).map(([k,v])=>`<div class="stat-item"><span>${escapeHTML(k)}</span><strong>${escapeHTML(typeof v==='object'?JSON.stringify(v):v)}</strong></div>`).join('')}</div>`;
+ if(typeof value==='string'){
+  try{value=JSON.parse(value)}catch{return '<p class="muted">Progression data unavailable.</p>'}
+ }
+ if(!value||typeof value!=='object'||Array.isArray(value)||!Object.keys(value).length)
+  return '<p class="detail-copy">No progression points added yet.</p>';
+
+ const entries=Object.entries(value);
+ return `<div class="progress-grid">${entries.map(([key,val])=>{
+  const numeric=typeof val==='number'&&Number.isFinite(val)&&val>=0;
+  const width=numeric?Math.min(100,(val/16)*100):0;
+  const icon=progressionIcons[key.toLowerCase().trim()]||'✦';
+  const display=typeof val==='object'?JSON.stringify(val):val;
+  return `<div class="progress-item">
+   <div class="progress-top">
+    <span class="progress-icon" aria-hidden="true">${icon}</span>
+    <span class="progress-name">${escapeHTML(key)}</span>
+    <strong class="progress-value">${escapeHTML(display)}</strong>
+   </div>
+   ${numeric?`<div class="progress-track" role="meter" aria-label="${escapeHTML(key)}" aria-valuemin="0" aria-valuemax="${Math.max(16,val)}" aria-valuenow="${val}">
+    <div class="progress-fill" style="width:${width}%"></div>
+   </div>`:''}
+  </div>`;
+ }).join('')}</div>`;
 }
-window.showGuide=id=>{
-  const g=guides.find(item=>item.id===id);if(!g)return;
-  const detail=$('detailContent');
-  detail.innerHTML=`<div class="modal-hero"><div>${g.image_url?`<img class="modal-image" src="${escapeHTML(g.image_url)}" alt="${escapeHTML(g.player_name||g.title)}" onerror="this.style.display='none'">`:`<div class="modal-image card-placeholder" style="display:grid;place-items:center">${escapeHTML(getInitials(g))}</div>`}</div><div><div class="detail-label">${g.category==='progression'?'PLAYER PROGRESSION':'FORMATION & TACTICS'}</div><h2 id="detailTitle">${escapeHTML(g.title)}</h2><div class="detail-chips">${g.player_name?`<span>Player: ${escapeHTML(g.player_name)}</span>`:''}${g.position?`<span>Position: ${escapeHTML(g.position)}</span>`:''}${g.playstyle?`<span>${escapeHTML(g.playstyle)}</span>`:''}${g.formation?`<span>Formation: ${escapeHTML(g.formation)}</span>`:''}${g.manager?`<span>Manager: ${escapeHTML(g.manager)}</span>`:''}</div><p class="detail-copy">${escapeHTML(g.content||'')}</p></div></div>
-  ${g.category==='progression'?`<div class="detail-section"><h3>Progression points</h3>${progressionHTML(g.progression)}</div>`:''}
-  ${g.tactics?`<div class="detail-section"><h3>Squad tactics</h3><p class="detail-copy">${escapeHTML(g.tactics)}</p></div>`:''}
-  <div class="detail-section"><h3>About this guide</h3><p class="detail-copy">Use this as a starting point and adjust the build to your playstyle, player version and squad needs.</p></div>`;
-  $('detailModal').classList.add('open');document.body.style.overflow='hidden';
-};
-function closeDetail(){$('detailModal').classList.remove('open');document.body.style.overflow=''}
+
+function showGuide(id){
+ const g=guides.find(item=>String(item.id)===String(id));
+ if(!g||(!isAdmin&&!g.published))return;
+ lastDetailFocus=document.activeElement;
+ const image=g.image_url?
+  `<img class="modal-image" src="${escapeHTML(g.image_url)}" alt="${escapeHTML(g.player_name||g.title)}">`:
+  `<div class="modal-image card-placeholder" style="display:grid;place-items:center">${escapeHTML(getInitials(g))}</div>`;
+ $('detailContent').innerHTML=`
+ <div class="modal-hero">
+  <div>${image}</div>
+  <div>
+   <div class="detail-label">${g.category==='progression'?'PLAYER PROGRESSION':'FORMATION & TACTICS'}</div>
+   <h2 id="detailTitle">${escapeHTML(g.player_name||g.title)}</h2>
+   ${g.player_name?`<h3>${escapeHTML(g.title)}</h3>`:''}
+   <div class="detail-chips">
+    ${g.position?`<span>Position: ${escapeHTML(g.position)}</span>`:''}
+    ${g.playstyle?`<span>${escapeHTML(g.playstyle)}</span>`:''}
+    ${g.formation?`<span>Formation: ${escapeHTML(g.formation)}</span>`:''}
+    ${g.manager?`<span>Manager: ${escapeHTML(g.manager)}</span>`:''}
+   </div>
+   <p class="detail-copy">${escapeHTML(g.content||'')}</p>
+  </div>
+ </div>
+ ${g.category==='progression'?`<div class="detail-section"><h3>PROGRESSION POINTS</h3>${progressionHTML(g.progression)}</div>`:''}
+ ${g.tactics?`<div class="detail-section"><h3>SQUAD TACTICS</h3><p class="detail-copy">${escapeHTML(g.tactics)}</p></div>`:''}
+ <div class="detail-section"><h3>CALWIU NOTE</h3>
+ <p class="detail-copy">Adjust progression based on your player version, squad and preferred playstyle.</p></div>`;
+ $('detailModal').classList.add('open');
+ document.body.classList.add('locked');
+ $('closeDetail').focus();
+}
+window.showGuide=showGuide;
+function closeDetail(){
+ $('detailModal').classList.remove('open');
+ document.body.classList.remove('locked');
+ if(lastDetailFocus?.isConnected)lastDetailFocus.focus();
+}
 $('closeDetail').onclick=closeDetail;
-$('detailModal').addEventListener('click',e=>{if(e.target===$('detailModal'))closeDetail()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDetail()});
+$('detailModal').onclick=e=>{if(e.target===$('detailModal'))closeDetail()};
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'){
+  closeDetail();closeMenu();
+ }
+ if(e.key==='Tab'&&$('detailModal').classList.contains('open')){
+  const controls=[...$('detailModal').querySelectorAll('button,a,input,select,textarea,[tabindex]:not([tabindex="-1"])')]
+   .filter(el=>!el.disabled);
+  if(!controls.length)return;
+  const first=controls[0],last=controls[controls.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+ }
+});
+
+/* ADMIN GUIDE MANAGEMENT */
 function renderAdminGuides(){
-  if(!currentUser){$('adminGuideList').innerHTML='';return}
-  $('adminGuideList').innerHTML=guides.length?guides.map(g=>`<div class="admin-guide-row"><div><strong>${escapeHTML(g.title)}</strong><small>${g.published?'Published':'Draft'} · ${g.category==='progression'?'Player progression':'Formation'}</small></div><div class="actions" style="margin:0"><button class="btn btn-ghost" onclick="editGuide('${g.id}')">Edit</button></div></div>`).join(''):'<p class="muted">No guides created yet.</p>';
+ if(!isAdmin)return;
+ $('adminGuideList').innerHTML=guides.length?guides.map(g=>`
+ <div class="admin-guide-row">
+ <div><strong>${escapeHTML(g.title)}</strong>
+ <small>${g.published?'Published':'Draft'} · ${escapeHTML(g.category)}</small></div>
+ <button class="btn btn-ghost" data-edit="${escapeHTML(g.id)}">Edit</button>
+ </div>`).join(''):'<p class="muted">No guides created yet.</p>';
 }
-function resetForm(){editingId=null;$('guideForm').reset();$('progression').value='{}';$('saveButton').textContent='Save guide';hideMessage('adminMessage')}
-window.editGuide=id=>{
-  const g=guides.find(item=>item.id===id);if(!g||!currentUser)return;
-  editingId=id;['category','title','player_name','position','playstyle','formation','manager','tactics','content','image_url'].forEach(k=>$(k).value=g[k]||'');
-  $('progression').value=JSON.stringify(g.progression||{},null,2);$('published').checked=!!g.published;$('saveButton').textContent='Update guide';hideMessage('adminMessage');$('adminPanel').scrollIntoView({behavior:'smooth'});
+$('adminGuideList').addEventListener('click',e=>{
+ const b=e.target.closest('[data-edit]');
+ if(b)editGuide(b.dataset.edit);
+});
+function resetForm(){
+ editingId=null;
+ $('guideForm').reset();
+ $('progression').value='{}';
+ $('saveButton').textContent='Save Guide';
+}
+function editGuide(id){
+ if(!isAdmin)return;
+ const g=guides.find(item=>String(item.id)===String(id));
+ if(!g)return;
+ editingId=g.id;
+ ['category','title','player_name','position','playstyle','formation','manager','tactics','content','image_url']
+ .forEach(k=>$(k).value=g[k]||'');
+ $('progression').value=JSON.stringify(g.progression||{},null,2);
+ $('published').checked=!!g.published;
+ $('saveButton').textContent='Update Guide';
+ hideMessage('adminMessage');
+ scrollToId('adminPanel');
+}
+window.editGuide=editGuide;
+
+async function deleteGuide(id){
+ if(!isAdmin||!confirm('Permanently delete this guide?'))return;
+ const {error}=await db.from('guides').delete().eq('id',id);
+ if(error)return message('adminMessage','Delete failed: '+error.message);
+ await loadGuides();
+ message('adminMessage','Guide deleted successfully.');
+}
+window.deleteGuide=deleteGuide;
+
+$('guideForm').onsubmit=async e=>{
+ e.preventDefault();
+ if(!isAdmin)return message('adminMessage','Admin access required.');
+ hideMessage('adminMessage');
+ let progression;
+ try{
+  progression=JSON.parse($('progression').value||'{}');
+  if(!progression||typeof progression!=='object'||Array.isArray(progression))throw Error();
+ }catch{
+  return message('adminMessage','Progression must be a valid JSON object.');
+ }
+ const title=$('title').value.trim();
+ const content=$('content').value.trim();
+ if(!title||!content)return message('adminMessage','Title and content are required.');
+ const record={
+  category:$('category').value,
+  title,
+  slug:slugify(title),
+  player_name:$('player_name').value.trim()||null,
+  position:$('position').value.trim()||null,
+  playstyle:$('playstyle').value.trim()||null,
+  formation:$('formation').value.trim()||null,
+  manager:$('manager').value.trim()||null,
+  tactics:$('tactics').value.trim()||null,
+  progression,
+  content,
+  image_url:$('image_url').value.trim()||null,
+  published:$('published').checked,
+  updated_at:new Date().toISOString()
+ };
+ const button=$('saveButton');
+ button.disabled=true;
+ try{
+  const result=editingId?
+   await db.from('guides').update(record).eq('id',editingId):
+   await db.from('guides').insert({...record,created_by:currentUser.id});
+  if(result.error)throw result.error;
+  resetForm();
+  await loadGuides();
+  message('adminMessage',record.published?'Guide published successfully!':'Guide saved as draft.');
+ }catch(err){
+  message('adminMessage','Save failed: '+err.message);
+ }finally{button.disabled=false}
 };
-window.deleteGuide=async id=>{
-  if(!currentUser||!confirm('Delete this guide permanently?'))return;
-  const {error}=await db.from('guides').delete().eq('id',id);
-  if(error)return message('adminMessage','Delete failed: '+error.message);
-  message('adminMessage','Guide deleted.');await loadGuides();
+$('resetButton').onclick=()=>{
+ resetForm();hideMessage('adminMessage');
 };
+
+/* VISITOR BUILD REQUESTS */
+$('requestForm').onsubmit=async e=>{
+ e.preventDefault();
+ hideMessage('requestMessage');
+ const player=$('requestPlayer').value.trim();
+ if(!player)return message('requestMessage','Please enter a player name.');
+ const button=$('requestSubmit');
+ button.disabled=true;
+ button.textContent='SENDING...';
+ try{
+  const record={
+   player_name:player,
+   position:$('requestPosition').value||null,
+   card_version:$('requestVersion').value.trim()||null,
+   contact:$('requestContact').value.trim()||null,
+   notes:$('requestNotes').value.trim()||null
+  };
+  const {error}=await db.from('build_requests').insert(record);
+  if(error)throw error;
+  $('requestForm').reset();
+  message('requestMessage','✓ Request submitted successfully! Thank you for supporting CALWIU.');
+ }catch(err){
+  console.error(err);
+  message('requestMessage','Could not submit your request. Please try again later.');
+ }finally{
+  button.disabled=false;
+  button.textContent='SEND REQUEST ↗';
+ }
+};
+
+/* ADMIN REQUEST REVIEW */
+async function loadRequests(){
+ if(!isAdmin)return;
+ $('requestList').textContent='Loading requests...';
+ const {data,error}=await db.from('build_requests')
+  .select('id,player_name,position,card_version,contact,notes,status,created_at')
+  .order('created_at',{ascending:false});
+ if(error){
+  $('requestList').textContent='Unable to load requests: '+error.message;
+  return;
+ }
+ $('requestList').innerHTML=data.length?data.map(r=>`
+ <article class="request-row">
+ <div>
+  <strong>${escapeHTML(r.player_name)}</strong>
+  <small>${escapeHTML(r.position||'Position not specified')} · ${escapeHTML(r.card_version||'Version not specified')}</small>
+  <small>Received: ${escapeHTML(new Date(r.created_at).toLocaleString())}</small>
+  ${r.contact?`<p>Contact: ${escapeHTML(r.contact)}</p>`:''}
+  ${r.notes?`<p>Notes: ${escapeHTML(r.notes)}</p>`:''}
+ </div>
+ <div>
+  <label for="status-${escapeHTML(r.id)}">Status</label>
+  <select id="status-${escapeHTML(r.id)}" data-request-id="${escapeHTML(r.id)}" aria-label="Request status for ${escapeHTML(r.player_name)}">
+   ${['pending','reviewing','completed','declined'].map(s=>
+    `<option value="${s}" ${r.status===s?'selected':''}>${s.toUpperCase()}</option>`
+   ).join('')}
+  </select>
+ </div>
+ </article>`).join(''):'<p class="muted">No build requests yet.</p>';
+}
+$('requestList').addEventListener('change',async e=>{
+ const select=e.target.closest('[data-request-id]');
+ if(!select||!isAdmin)return;
+ const id=select.dataset.requestId;
+ const status=select.value;
+ select.disabled=true;
+ const {error}=await db.from('build_requests').update({status}).eq('id',id);
+ if(error){
+  alert('Update failed: '+error.message);
+  await loadRequests();
+ }else{
+  select.disabled=false;
+ }
+});
+$('refreshRequests').onclick=loadRequests;
+
+/* AUTHENTICATION */
 $('loginToggle').onclick=()=>{
-  if(currentUser){$('adminPanel').scrollIntoView({behavior:'smooth'})}
-  else{$('loginPanel').classList.remove('hidden');$('loginPanel').scrollIntoView({behavior:'smooth'})}
+ closeMenu();
+ if(isAdmin)scrollToId('adminPanel');
+ else{
+  $('loginPanel').classList.remove('hidden');
+  scrollToId('loginPanel');
+ }
 };
-$('cancelLogin').onclick=()=>$('loginPanel').classList.add('hidden');
+$('cancelLogin').onclick=()=>{
+ $('loginPanel').classList.add('hidden');
+ hideMessage('loginMessage');
+};
 $('loginForm').onsubmit=async e=>{
-  e.preventDefault();hideMessage('loginMessage');
-  const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
-  if(error)return message('loginMessage','Login failed. Check your email, password and whether the account is confirmed.');
-  currentUser=data.user;$('loginPanel').classList.add('hidden');$('password').value='';updatePanels();await loadGuides();
+ e.preventDefault();
+ hideMessage('loginMessage');
+ const button=$('signInButton');
+ button.disabled=true;
+ try{
+  const {data,error}=await db.auth.signInWithPassword({
+   email:$('email').value.trim(),
+   password:$('password').value
+  });
+  if(error)throw error;
+  const allowed=await verifyAdmin(data.user);
+  if(!allowed){
+   await db.auth.signOut();
+   message('loginMessage','This account is not authorised as a CALWIU administrator.');
+   return;
+  }
+  $('password').value='';
+  await syncAuth({user:data.user});
+  scrollToId('adminPanel');
+ }catch(err){
+  message('loginMessage','Login failed. Please check your credentials and admin permissions.');
+  console.error(err);
+ }finally{button.disabled=false}
 };
 $('logoutButton').onclick=async()=>{
-  const {error}=await db.auth.signOut();if(error)return message('adminMessage','Sign out failed. Please try again.');
-  currentUser=null;updatePanels();resetForm();await loadGuides();
+ const {error}=await db.auth.signOut();
+ if(error)return message('adminMessage','Sign out failed: '+error.message);
+ await syncAuth(null);
+ resetForm();
+ scrollToId('home');
 };
-$('guideForm').onsubmit=async e=>{
-  e.preventDefault();if(!currentUser)return message('adminMessage','Please sign in first.');hideMessage('adminMessage');
-  let progression;try{progression=JSON.parse($('progression').value||'{}')}catch{return message('adminMessage','Progression details must be valid JSON. Example: {"Shooting": 8, "Dexterity": 10}.')}
-  const title=$('title').value.trim();
-  const record={category:$('category').value,title,slug:slugify(title),player_name:$('player_name').value.trim()||null,position:$('position').value.trim()||null,playstyle:$('playstyle').value.trim()||null,formation:$('formation').value.trim()||null,manager:$('manager').value.trim()||null,tactics:$('tactics').value.trim()||null,progression,content:$('content').value.trim(),image_url:$('image_url').value.trim()||null,published:$('published').checked,updated_at:new Date().toISOString()};
-  const result=editingId?await db.from('guides').update(record).eq('id',editingId):await db.from('guides').insert({...record,created_by:currentUser.id});
-  if(result.error)return message('adminMessage','Save failed: '+result.error.message+'. If the title already exists, change it slightly because each slug must be unique.');
-  message('adminMessage',record.published?'Guide published!':'Guide saved as draft.');resetForm();await loadGuides();
-};
-$('resetButton').onclick=resetForm;
+
+/* EVENTS AND INITIAL LOAD */
 $('search').addEventListener('input',renderGuides);
 $('positionFilter').addEventListener('change',renderGuides);
-document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>setCategory(button.dataset.filter)));
-db.auth.onAuthStateChange((_event,session)=>{
-  currentUser=session?.user||null;updatePanels();
-  // Avoid doing an awaited Supabase request inside the auth callback.
-  Promise.resolve().then(()=>loadGuides());
+document.querySelectorAll('[data-filter]').forEach(b=>
+ b.addEventListener('click',()=>setCategory(b.dataset.filter))
+);
+
+db.auth.onAuthStateChange((event,session)=>{
+ if(event==='INITIAL_SESSION'||event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='TOKEN_REFRESHED'){
+  // Do not await Supabase operations inside this callback.
+  setTimeout(()=>syncAuth(session),0);
+ }
 });
-updatePanels();loadGuides();
+updatePanels();
 </script>
 </body>
 </html>
