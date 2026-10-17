@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090910">
+<meta name="description" content="CALWIU - eFootball player progression builds, best formations and squad tactics.">
+<title>CALWIU | eFootball Builds & Tactics</title>
+<style>
+:root{--bg:#090910;--panel:#141420;--line:#29283b;--purple:#9b7bff;--cyan:#61e9f5;--muted:#aaa9bd}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#f7f6ff;font:15px system-ui,Arial,sans-serif}
+header{padding:18px 5%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);position:sticky;top:0;background:#090910ee;backdrop-filter:blur(12px);z-index:5}
+.logo{font-weight:950;font-size:25px;letter-spacing:3px;color:white}
+.logo span{color:var(--purple)}
+button,input{font:inherit}
+button{cursor:pointer}
+nav{display:flex;gap:8px}
+.btn{border:1px solid var(--line);background:var(--panel);color:white;padding:10px 14px;border-radius:10px}
+.btn.active,.primary{background:var(--purple);border-color:var(--purple);color:#090910;font-weight:800}
+.hero{margin:24px auto;width:90%;max-width:1200px;min-height:300px;border:1px solid #36304e;border-radius:24px;padding:clamp(25px,6vw,65px);display:flex;align-items:center;overflow:hidden;position:relative;background:radial-gradient(ellipse at 85% 50%,#5436a8 0,transparent 38%),linear-gradient(120deg,#171322,#0b101b 65%,#211339)}
+.hero:after{content:"⚽";position:absolute;right:7%;font-size:clamp(100px,22vw,230px);opacity:.13}
+.hero-content{position:relative;z-index:1;max-width:620px}
+.eyebrow{color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:3px}
+h1{font-size:clamp(38px,7vw,76px);line-height:1.02;margin:14px 0}
+h1 span{color:var(--purple)}
+p{color:var(--muted);line-height:1.65}
+.hero .btn{margin-top:12px}
+main{width:90%;max-width:1200px;margin:35px auto 70px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h2{font-size:24px;margin:10px 0}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
+input{width:100%;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;color:white;padding:14px;outline:none}
+input:focus{border-color:var(--purple)}
+.search{flex:1;min-width:180px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
+.card{border:1px solid var(--line);background:var(--panel);border-radius:16px;overflow:hidden;cursor:pointer;transition:.2s}
+.card:hover{transform:translateY(-4px);border-color:var(--purple)}
+.art{height:155px;display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(circle at 50% 40%,#57428b,#171322 65%);font-size:58px;position:relative}
+.art.formation{background:radial-gradient(circle,#164c40,#101e22 75%)}
+.rating{position:absolute;top:12px;left:12px;background:#080810df;border:1px solid #7662a9;border-radius:8px;padding:6px 9px;font-weight:900}
+.card-body{padding:15px}
+.tag{font-size:11px;letter-spacing:1px;color:var(--cyan);font-weight:800}
+.card h3{margin:8px 0;font-size:18px}
+.card p{font-size:13px;margin:5px 0 12px}
+.open{color:var(--purple);font-weight:750}
+.empty{display:none;padding:30px;text-align:center;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:25px 5%;color:var(--muted);text-align:center}
+dialog{background:#151421;color:white;border:1px solid #62518a;border-radius:18px;padding:24px;width:min(92%,520px);max-height:85vh;overflow:auto}
+dialog::backdrop{background:#000c;backdrop-filter:blur(5px)}
+.modal-top{display:flex;justify-content:space-between;align-items:center}
+.close{background:transparent;color:white;border:1px solid var(--line);border-radius:9px;padding:8px}
+details{background:#0d0d16;border:1px solid var(--line);border-radius:10px;padding:12px;margin:12px 0}
+@media(max-width:520px){header{padding:14px 5%}.logo{font-size:21px}nav .btn{padding:8px;font-size:12px}.hero{min-height:270px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.art{height:120px;font-size:43px}.card-body{padding:11px}.card h3{font-size:15px}.card p{font-size:12px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">CAL<span>WIU</span></div>
+  <nav>
+    <button class="btn active" data-tab="players">Players</button>
+    <button class="btn" data-tab="formations">Formations</button>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="eyebrow">YOUR eFOOTBALL KNOWLEDGE HUB</div>
+    <h1>BUILD YOUR<br><span>DREAM TEAM.</span></h1>
+    <p>Discover player progression builds, powerful formations and tactics for your next match.</p>
+    <button class="btn primary" id="explore">EXPLORE BUILDS ↗</button>
+  </div>
+</section>
+
+<main id="guides">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">THE COMMUNITY LIBRARY</div>
+      <h2 id="heading">Player Progressions</h2>
+    </div>
+    <span class="tag" id="count"></span>
+  </div>
+  <div class="tools">
+    <input class="search" id="search" placeholder="Search player, position or formation..." aria-label="Search guides">
+    <button class="btn active" data-tab="players">Player Builds</button>
+    <button class="btn" data-tab="formations">Team Tactics</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty">No guides found. Try another search.</div>
+</main>
+
+<footer>
+  <div class="logo">CAL<span>WIU</span></div>
+  <p>eFootball fan-made progression and tactics guides.</p>
+  <small>Independent fan project. Not affiliated with KONAMI.</small>
+</footer>
+
+<dialog id="detail">
+  <div class="modal-top">
+    <span class="eyebrow">CALWIU GUIDE</span>
+    <button class="close" id="close">✕ Close</button>
+  </div>
+  <div id="detail-content"></div>
+</dialog>
+
+<script>
+const players = [
+ {name:"Creative Playmaker",pos:"AMF",rating:"98+",emoji:"🎯",desc:"Build a technical creator with passing and ball control.",stats:"Passing · Ball Control · Tight Possession",build:"Example build: prioritise passing, ball control and dribbling. Adjust points to the specific player and game version."},
+ {name:"Goal Poacher",pos:"CF",rating:"99+",emoji:"⚡",desc:"A striker build focused on finishing and attacking runs.",stats:"Finishing · Offensive Awareness · Acceleration",build:"Example build: prioritise finishing, offensive awareness and acceleration. Confirm the exact allocation for your player."},
+ {name:"Box-to-Box Engine",pos:"CMF",rating:"97+",emoji:"🔥",desc:"A balanced midfielder for both attack and defence.",stats:"Stamina · Passing · Defensive Engagement",build:"Example build: balance stamina, passing, ball control and defensive attributes."},
+ {name:"Defensive Wall",pos:"CB",rating:"98+",emoji:"🛡️",desc:"A centre-back setup designed for reliable defending.",stats:"Defensive Awareness · Tackling · Physical Contact",build:"Example build: prioritise defensive awareness, tackling and physical strength."}
+];
+const formations = [
+ {name:"Quick Counter",pos:"4-2-1-3",rating:"META",emoji:"⚽",desc:"A direct attacking setup with two holding midfielders.",stats:"2 DMF · 1 AMF · 3 forwards",build:"Suggested setup: 4 defenders, 2 DMFs, 1 AMF, 2 wide forwards and 1 CF. Use quick forward passes and compact defending."},
+ {name:"Possession Game",pos:"4-3-3",rating:"CONTROL",emoji:"🟢",desc:"A balanced system for keeping possession and building attacks.",stats:"3 midfielders · Wide forwards",build:"Suggested setup: 4 defenders, 3 midfielders and 3 forwards. Keep passing options close and build attacks patiently."},
+ {name:"Compact Attack",pos:"4-2-2-2",rating:"META",emoji:"🎮",desc:"Two forwards supported by two attacking midfielders.",stats:"2 DMF/CMF · 2 AMF · 2 CF",build:"Suggested setup: 4 defenders, 2 deeper midfielders, 2 attacking midfielders and 2 strikers. Use short combinations through the middle."},
+ {name:"Narrow Diamond",pos:"4-3-1-2",rating:"TACTICAL",emoji:"💎",desc:"Central overloads with two strikers up front.",stats:"3 CMF/DMF · 1 AMF · 2 CF",build:"Suggested setup: 4 defenders, 3 central midfielders, 1 AMF and 2 CF. Use central passing triangles and overlapping fullbacks."}
+];
+let tab="players";
+const grid=document.querySelector("#grid"), search=document.querySelector("#search");
+function render(){
+ const list=tab==="players"?players:formations;
+ const q=search.value.toLowerCase();
+ const shown=list.filter(x=>(x.name+" "+x.pos+" "+x.desc+" "+x.stats).toLowerCase().includes(q));
+ document.querySelector("#heading").textContent=tab==="players"?"Player Progressions":"Best Formations";
+ document.querySelector("#count").textContent=shown.length+" GUIDES";
+ grid.innerHTML=shown.map((x)=>`
+ <article class="card" tabindex="0" data-name="${x.name}">
+ <div class="art ${tab==="formations"?"formation":""}">
+ <span class="rating">${x.rating}</span>${x.emoji}
+ </div><div class="card-body">
+ <div class="tag">${tab==="players"?"PLAYER BUILD":"FORMATION"} · ${x.pos}</div>
+ <h3>${x.name}</h3><p>${x.desc}</p>
+ <span class="open">View guide ↗</span></div></article>`).join("");
+ document.querySelector("#empty").style.display=shown.length?"none":"block";
+ document.querySelectorAll(".card").forEach(card=>{
+   const item=shown.find(x=>x.name===card.dataset.name);
+   card.onclick=()=>openGuide(item);
+   card.onkeydown=e=>{if(e.key==="Enter")openGuide(item)};
+ });
+ document.querySelectorAll("[data-tab]").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+}
+function openGuide(x){
+ document.querySelector("#detail-content").innerHTML=`
+ <div class="art ${tab==="formations"?"formation":""}" style="border-radius:12px;margin-top:18px">${x.emoji}</div>
+ <div class="tag" style="margin-top:20px">${tab==="players"?"PLAYER PROGRESSION":"BEST FORMATION"} · ${x.pos}</div>
+ <h2>${x.name}</h2><p>${x.desc}</p>
+ <details open><summary>Recommended attributes / setup</summary><p>${x.stats}</p><p>${x.build}</p></details>
+ <p><small>Demo guide: replace this sample with a verified build for the exact player card or team tactic.</small></p>`;
+ document.querySelector("#detail").showModal();
+}
+document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
+search.addEventListener("input",render);
+document.querySelector("#explore").onclick=()=>document.querySelector("#guides").scrollIntoView({behavior:"smooth"});
+document.querySelector("#close").onclick=()=>document.querySelector("#detail").close();
+document.querySelector("#detail").onclick=e=>{if(e.target.id==="detail")e.target.close()};
+render();
+</script>
+</body>
+</html>
