@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://hazeloze.github.io/Calwiu/sitemap.xml
