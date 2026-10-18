@@ -1090,5 +1090,194 @@ db.auth.onAuthStateChange((event,session)=>{
 });
 updatePanels();
 </script>
+  
+<script>
+(() => {
+  const style = document.createElement('style');
+
+  style.textContent = `
+    .guide-card.calwiu-animated {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      border-color: #454b70;
+      box-shadow: 0 8px 24px #0008;
+      transform-style: preserve-3d;
+    }
+
+    .guide-card.calwiu-animated::before {
+      content: "";
+      position: absolute;
+      inset: -60%;
+      z-index: 5;
+      pointer-events: none;
+      opacity: 0;
+      background: linear-gradient(
+        115deg,
+        transparent 38%,
+        #ffffff12 44%,
+        #a8baff99 49%,
+        #ffffffbb 52%,
+        #7b8cff55 56%,
+        transparent 63%
+      );
+      transform: translateX(-70%) rotate(8deg);
+    }
+
+    .guide-card.calwiu-reveal {
+      animation: calwiuCardReveal .75s
+        cubic-bezier(.2,.75,.25,1) both !important;
+    }
+
+    @keyframes calwiuCardReveal {
+      from {
+        opacity: 0;
+        transform:
+          perspective(900px)
+          translateY(28px)
+          rotateX(9deg)
+          scale(.94);
+      }
+      to {
+        opacity: 1;
+        transform:
+          perspective(900px)
+          translateY(0)
+          rotateX(0)
+          scale(1);
+      }
+    }
+
+    .guide-card.calwiu-shine::before {
+      animation: calwiuShine 1.15s ease-out .12s both;
+    }
+
+    @keyframes calwiuShine {
+      0% {
+        opacity: 0;
+        transform: translateX(-70%) rotate(8deg);
+      }
+      25% { opacity: 1; }
+      100% {
+        opacity: 0;
+        transform: translateX(70%) rotate(8deg);
+      }
+    }
+
+    .guide-card.calwiu-glow {
+      border-color: #8497ff;
+      box-shadow:
+        0 12px 32px #0009,
+        0 0 22px #596cff55;
+    }
+
+    .guide-card.calwiu-reveal .card-rating {
+      animation: calwiuRatingPop .45s
+        cubic-bezier(.2,.8,.3,1.4) .3s both;
+    }
+
+    @keyframes calwiuRatingPop {
+      from {
+        opacity: 0;
+        transform: scale(.55);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @media (hover:hover) and (pointer:fine) {
+      .guide-card.calwiu-animated:hover {
+        transform: translateY(-6px) scale(1.012);
+        border-color: #aab8ff;
+        box-shadow:
+          0 18px 38px #000b,
+          0 0 20px #697aff33;
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .guide-card.calwiu-animated,
+      .guide-card.calwiu-animated::before,
+      .guide-card.calwiu-animated .card-rating {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+
+  const reducedMotion =
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function setupCard(card) {
+    if (card.dataset.calwiuMotion === '1') return;
+
+    card.dataset.calwiuMotion = '1';
+    card.classList.add('calwiu-animated');
+
+    if (reducedMotion) return;
+
+    observer.observe(card);
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+
+      const card = entry.target;
+
+      card.classList.remove(
+        'calwiu-reveal',
+        'calwiu-shine',
+        'calwiu-glow'
+      );
+
+      // Restart animations when the card enters the screen.
+      void card.offsetWidth;
+
+      card.classList.add(
+        'calwiu-reveal',
+        'calwiu-shine',
+        'calwiu-glow'
+      );
+
+      observer.unobserve(card);
+
+      card.addEventListener('animationend', event => {
+        if (event.animationName === 'calwiuCardReveal') {
+          card.classList.remove('calwiu-reveal');
+        }
+      }, { once: true });
+
+      window.setTimeout(() => {
+        card.classList.remove('calwiu-shine', 'calwiu-glow');
+      }, 1800);
+    });
+  }, {
+    threshold: 0.18,
+    rootMargin: '0px 0px -30px 0px'
+  });
+
+  function scanCards() {
+    document.querySelectorAll('.guide-card').forEach(setupCard);
+  }
+
+  // Initial cards
+  scanCards();
+
+  // Also detect cards added by search, filters and Supabase loading.
+  const grid = document.getElementById('guideGrid');
+
+  if (grid) {
+    new MutationObserver(scanCards).observe(grid, {
+      childList: true
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
