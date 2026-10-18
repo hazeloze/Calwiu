@@ -7,6 +7,135 @@
 <meta name="description" content="CALWIU eFootball player builds, progression points, formations and tactics.">
 <title>CALWIU | eFootball Builds & Tactics</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+/* FORMATION PLAYER PLAYSTYLES */
+.formation-board {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.formation-pitch {
+  position: relative;
+  min-height: 430px;
+  overflow: hidden;
+  border: 2px solid #6e9b72;
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      #174c32 0px,
+      #174c32 55px,
+      #205d3b 55px,
+      #205d3b 110px
+    );
+}
+
+.formation-pitch::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid #ffffff85;
+  pointer-events: none;
+}
+
+.formation-pitch::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100px;
+  height: 100px;
+  border: 1px solid #ffffff85;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.pitch-halfway {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  right: 8px;
+  border-top: 1px solid #ffffff85;
+}
+
+.pitch-player {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  width: 70px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.pitch-player .position {
+  display: block;
+  margin: auto;
+  width: 36px;
+  padding: 7px 0;
+  border-radius: 50%;
+  background: white;
+  color: #111;
+  font-size: 10px;
+  font-weight: 1000;
+  box-shadow: 0 2px 10px #0008;
+}
+
+.pitch-player .pitch-name {
+  display: block;
+  margin-top: 4px;
+  color: white;
+  font-size: 10px;
+  font-weight: 900;
+  text-shadow: 0 2px 5px #000;
+}
+
+.formation-roster {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.formation-player-row {
+  padding: 12px;
+  background: #1a1a1a;
+  border: 1px solid #393939;
+  border-radius: 6px;
+  min-width: 0;
+}
+
+.formation-player-row strong {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+
+.formation-player-row span {
+  display: block;
+  margin-top: 5px;
+  color: #bbb;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.formation-style {
+  display: inline-block !important;
+  color: white !important;
+  background: #303030;
+  padding: 5px 7px;
+  border-radius: 4px;
+}
+
+@media(max-width:560px) {
+  .formation-pitch { min-height: 390px; }
+  .formation-roster { grid-template-columns: 1fr; }
+  .pitch-player { width: 62px; }
+  .pitch-player .pitch-name { font-size: 9px; }
+}
+
 <style>
 :root{
   color-scheme:dark;
@@ -808,6 +937,61 @@ function progressionHTML(value){
  }).join('')}</div>`;
 }
 
+function formationPlayersHTML(value) {
+  if (typeof value === 'string') {
+    try { value = JSON.parse(value); }
+    catch { value = {}; }
+  }
+
+  const players = Array.isArray(value?.players)
+    ? value.players.filter(p =>
+        p && typeof p === 'object' &&
+        p.name && p.position
+      )
+    : [];
+
+  if (!players.length) {
+    return `
+      <p class="detail-copy">
+        Player names and playing styles have not been added yet.
+      </p>`;
+  }
+
+  const markers = players.map(p => {
+    const x = Math.max(5, Math.min(95, Number(p.x ?? 50)));
+    const y = Math.max(5, Math.min(95, Number(p.y ?? 50)));
+
+    return `
+      <div class="pitch-player"
+           style="left:${x}%;top:${y}%">
+        <span class="position">${escapeHTML(p.position)}</span>
+        <span class="pitch-name">${escapeHTML(p.name)}</span>
+      </div>`;
+  }).join('');
+
+  const roster = players.map(p => `
+    <article class="formation-player-row">
+      <strong>${escapeHTML(p.name)}</strong>
+      <span>Position: ${escapeHTML(p.position)}</span>
+      <span class="formation-style">
+        ${escapeHTML(p.playstyle || 'Not specified')}
+      </span>
+    </article>
+  `).join('');
+
+  return `
+    <div class="formation-board">
+      <div class="formation-pitch">
+        <div class="pitch-halfway"></div>
+        ${markers}
+      </div>
+      <div>
+        <h3>PLAYER POSITIONS & PLAYING STYLES</h3>
+        <div class="formation-roster">${roster}</div>
+      </div>
+    </div>`;
+}
+  
 function showGuide(id){
  const g=guides.find(item=>String(item.id)===String(id));
  if(!g||(!isAdmin&&!g.published))return;
